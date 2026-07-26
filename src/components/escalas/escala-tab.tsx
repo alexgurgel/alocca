@@ -47,6 +47,7 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
             <EscalaFuncaoCard
               key={item.id}
               empresaId={empresaId}
+              eventoNome={evento.nome}
               escala={item}
               valorPadrao={evento.valor_diaria_padrao}
               onAtualizarVagas={atualizarVagas}

@@ -30,11 +30,17 @@ export async function GET(request: Request) {
     };
 
     if (metadata?.nome_empresa && metadata?.nome) {
-      await supabase.rpc("criar_empresa_e_perfil", {
+      const { error: rpcError } = await supabase.rpc("criar_empresa_e_perfil", {
         p_nome_empresa: metadata.nome_empresa,
         p_nome_usuario: metadata.nome,
         p_email: data.user.email ?? "",
       });
+
+      if (rpcError) {
+        return NextResponse.redirect(`${origin}/entrar?erro=perfil`);
+      }
+    } else {
+      return NextResponse.redirect(`${origin}/entrar?erro=perfil`);
     }
   }
 

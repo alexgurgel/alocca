@@ -87,3 +87,38 @@ export async function responderConvite(
   if (error) throw error;
   return data;
 }
+
+export interface ContePublico {
+  id: string;
+  status: "pendente" | "aceito" | "recusado";
+  valor_diaria: number | null;
+  observacoes: string | null;
+  funcao_nome: string;
+  evento_nome: string;
+  evento_local: string | null;
+  evento_endereco: string | null;
+  evento_data_inicio: string;
+  evento_data_fim: string;
+  evento_observacoes: string | null;
+}
+
+export async function getContePublico(
+  supabase: SupabaseClient<Database>,
+  id: string
+): Promise<ContePublico | null> {
+  const { data, error } = await supabase.rpc("obter_convite_publico", { p_id: id });
+  if (error) throw error;
+  return data?.[0] ?? null;
+}
+
+export async function responderContePublico(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  status: "aceito" | "recusado"
+) {
+  const { error } = await supabase.rpc("responder_convite_publico", {
+    p_id: id,
+    p_status: status,
+  });
+  if (error) throw error;
+}

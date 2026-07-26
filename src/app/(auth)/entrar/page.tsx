@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,15 @@ function EntrarForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
+
+  useEffect(() => {
+    const erro = searchParams.get("erro");
+    if (erro === "perfil") {
+      toast.error("Não foi possível concluir seu cadastro. Tente se cadastrar novamente.");
+    } else if (erro === "auth") {
+      toast.error("Não foi possível confirmar seu e-mail. Tente novamente.");
+    }
+  }, [searchParams]);
 
   async function onSubmit(values: LoginInput) {
     try {

@@ -1,19 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import { Mail, MessageCircle, Minus, Plus, Trash2, X, Link2 } from "lucide-react";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ConvidarColaboradorDialog } from "./convidar-colaborador-dialog";
 import { getInitials, formatCurrencyBRL } from "@/lib/format";
+import { getLinkConvite, getLinkEmail, getLinkWhatsApp, mensagemConvite } from "@/lib/convite-links";
 import { STATUS_CONVITE_LABEL, type EscalaFuncao } from "@/types";
 import { STATUS_CONVITE_TONE } from "@/lib/constants";
 import type { ConvidarColaboradorInput } from "@/lib/validations/escala.schema";
 
 interface EscalaFuncaoCardProps {
   empresaId: string;
+  eventoNome: string;
   escala: EscalaFuncao;
   valorPadrao?: number | null;
   onAtualizarVagas: (id: string, vagas: number) => Promise<void>;
@@ -24,6 +27,7 @@ interface EscalaFuncaoCardProps {
 
 export function EscalaFuncaoCard({
   empresaId,
+  eventoNome,
   escala,
   valorPadrao,
   onAtualizarVagas,
@@ -33,6 +37,12 @@ export function EscalaFuncaoCard({
 }: EscalaFuncaoCardProps) {
   const [confirmarRemover, setConfirmarRemover] = useState(false);
   const preenchidas = escala.convites.filter((c) => c.status === "aceito").length;
+
+  async function copiarLink(conviteId: string) {
+    const link = getLinkConvite(conviteId);
+    await navigator.clipboard.writeText(link);
+    toast.success("Link do convite copiado.");
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -110,11 +120,68 @@ export function EscalaFuncaoCard({
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 items-center gap-1">
                 <StatusBadge
                   label={STATUS_CONVITE_LABEL[convite.status]}
                   tone={STATUS_CONVITE_TONE[convite.status]}
                 />
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  title="Copiar link do convite"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => copiarLink(convite.id)}
+                >
+                  <Link2 className="size-3.5" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  title="Enviar por WhatsApp"
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  disabled={!convite.funcionario.telefone}
+                  render={
+                    <a
+                      href={
+                        getLinkWhatsApp(
+                          convite.funcionario.telefone,
+                          mensagemConvite(eventoNome, getLinkConvite(convite.id))
+                        ) ?? undefined
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
+                >
+                  <MessageCircle className="size-3.5" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  title="Enviar por e-mail"
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  disabled={!convite.funcionario.email}
+                  render={
+                    <a
+                      href={
+                        getLinkEmail(
+                          convite.funcionario.email,
+                          eventoNome,
+                          mensagemConvite(eventoNome, getLinkConvite(convite.id))
+                        ) ?? undefined
+                      }
+                    />
+                  }
+                >
+                  <Mail className="size-3.5" />
+                </Button>
+
                 <Button
                   type="button"
                   variant="ghost"

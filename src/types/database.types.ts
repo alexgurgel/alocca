@@ -276,6 +276,26 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
+      obter_convite_publico: {
+        Args: { p_id: string };
+        Returns: {
+          id: string;
+          status: StatusConvite;
+          valor_diaria: number | null;
+          observacoes: string | null;
+          funcao_nome: string;
+          evento_nome: string;
+          evento_local: string | null;
+          evento_endereco: string | null;
+          evento_data_inicio: string;
+          evento_data_fim: string;
+          evento_observacoes: string | null;
+        }[];
+      };
+      responder_convite_publico: {
+        Args: { p_id: string; p_status: string };
+        Returns: undefined;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
