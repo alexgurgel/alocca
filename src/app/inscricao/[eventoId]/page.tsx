@@ -5,10 +5,11 @@ import { useParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { CalendarDays, CheckCircle2, Loader2, MapPin, ShieldOff, Wallet } from "lucide-react";
+import { CalendarDays, CheckCircle2, Loader2, MapPin, ShieldOff } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
 import { EmptyState } from "@/components/shared/empty-state";
+import { LgpdConsentField } from "@/components/shared/lgpd-consent-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
 import { formatCPF, formatCurrencyBRL, formatDateTime, formatTelefone } from "@/lib/format";
+import { normalizarNomeCompleto, removerNumeros } from "@/lib/validations/nome";
 import { ESTADOS_BR } from "@/types";
 import {
   cpfLookupSchema,
@@ -39,6 +41,12 @@ import {
 } from "@/services/inscricao-publica.service";
 
 type Etapa = "cpf" | "formulario" | "sucesso";
+
+function descricaoFuncao(f: FuncaoDisponivel) {
+  const vagas = `${f.vagas_disponiveis} vaga${f.vagas_disponiveis === 1 ? "" : "s"}`;
+  const diaria = f.valor_diaria != null ? `${formatCurrencyBRL(f.valor_diaria)}/diária` : "";
+  return [f.nome, diaria, `(${vagas})`].filter(Boolean).join(" — ");
+}
 
 export default function InscricaoPublicaPage() {
   const params = useParams<{ eventoId: string }>();
@@ -76,6 +84,7 @@ export default function InscricaoPublicaPage() {
       cidade: "",
       estado: "",
       observacoes: "",
+      aceiteLgpd: false,
     },
   });
 
@@ -95,6 +104,7 @@ export default function InscricaoPublicaPage() {
           cidade: encontrado.cidade ?? "",
           estado: encontrado.estado ?? "",
           observacoes: encontrado.observacoes ?? "",
+          aceiteLgpd: false,
         });
       } else {
         setJaCadastrado(false);
@@ -175,14 +185,6 @@ export default function InscricaoPublicaPage() {
                   </div>
                 </div>
 
-                {evento.valor_diaria_padrao ? (
-                  <div className="flex items-start gap-3">
-                    <Wallet className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                    <p className="text-sm font-medium text-foreground">
-                      {formatCurrencyBRL(evento.valor_diaria_padrao)} / diária (referência)
-                    </p>
-                  </div>
-                ) : null}
               </div>
             </div>
 
@@ -234,12 +236,7 @@ export default function InscricaoPublicaPage() {
                     name="funcao_id"
                     render={({ field }) => (
                       <Select
-                        items={Object.fromEntries(
-                          funcoes.map((f) => [
-                            f.funcao_id,
-                            `${f.nome} (${f.vagas_disponiveis} vaga${f.vagas_disponiveis === 1 ? "" : "s"})`,
-                          ])
-                        )}
+                        items={Object.fromEntries(funcoes.map((f) => [f.funcao_id, descricaoFuncao(f)]))}
                         value={field.value}
                         onValueChange={(v: string | null) =>
                           form.setValue("funcao_id", v ?? "", { shouldValidate: true, shouldDirty: true })
@@ -251,7 +248,7 @@ export default function InscricaoPublicaPage() {
                         <SelectContent>
                           {funcoes.map((f) => (
                             <SelectItem key={f.funcao_id} value={f.funcao_id}>
-                              {f.nome} ({f.vagas_disponiveis} vaga{f.vagas_disponiveis === 1 ? "" : "s"})
+                              {descricaoFuncao(f)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -263,7 +260,19 @@ export default function InscricaoPublicaPage() {
 
                 <Field data-invalid={!!form.formState.errors.nome}>
                   <FieldLabel htmlFor="nome">Nome completo</FieldLabel>
-                  <Input id="nome" placeholder="Ex: João da Silva" {...form.register("nome")} />
+                  <Controller
+                    control={form.control}
+                    name="nome"
+                    render={({ field }) => (
+                      <Input
+                        id="nome"
+                        placeholder="Ex: João da Silva"
+                        value={field.value}
+                        onChange={(e) => field.onChange(removerNumeros(e.target.value))}
+                        onBlur={() => field.onChange(normalizarNomeCompleto(field.value ?? ""))}
+                      />
+                    )}
+                  />
                   <FieldError errors={[form.formState.errors.nome]} />
                 </Field>
 
@@ -340,6 +349,19 @@ export default function InscricaoPublicaPage() {
                   <FieldLabel htmlFor="observacoes">Observações</FieldLabel>
                   <Textarea id="observacoes" rows={3} {...form.register("observacoes")} />
                 </Field>
+
+                <Controller
+                  control={form.control}
+                  name="aceiteLgpd"
+                  render={({ field }) => (
+                    <LgpdConsentField
+                      id="aceiteLgpd"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      error={form.formState.errors.aceiteLgpd}
+                    />
+                  )}
+                />
 
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}

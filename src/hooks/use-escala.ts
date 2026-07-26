@@ -6,9 +6,15 @@ import {
   addFuncaoAoEvento,
   listEscalaDoEvento,
   removeFuncaoDoEvento,
+  updateValorDiariaFuncaoEvento,
   updateVagasFuncaoEvento,
 } from "@/services/escalas.service";
-import { cancelarConvite, enviarConvite, responderConvite } from "@/services/convites.service";
+import {
+  avaliarCandidatura as avaliarCandidaturaService,
+  cancelarConvite,
+  enviarConvite,
+  responderConvite,
+} from "@/services/convites.service";
 import type { EscalaFuncao } from "@/types";
 import type { EscalaFuncaoInput, ConvidarColaboradorInput } from "@/lib/validations/escala.schema";
 import { toast } from "sonner";
@@ -72,6 +78,15 @@ export function useEscala(eventoId: string | undefined) {
     [recarregar]
   );
 
+  const atualizarValorDiaria = useCallback(
+    async (id: string, valorDiaria: number) => {
+      const supabase = createClient();
+      await updateValorDiariaFuncaoEvento(supabase, id, valorDiaria);
+      await recarregar();
+    },
+    [recarregar]
+  );
+
   const removerFuncao = useCallback(
     async (id: string) => {
       const supabase = createClient();
@@ -113,9 +128,9 @@ export function useEscala(eventoId: string | undefined) {
   );
 
   const avaliarCandidatura = useCallback(
-    async (conviteId: string, status: "aceito" | "recusado") => {
+    async (conviteId: string, status: "aceito" | "recusado", valorDiariaFuncao: number | null) => {
       const supabase = createClient();
-      await responderConvite(supabase, conviteId, status);
+      await avaliarCandidaturaService(supabase, conviteId, status, valorDiariaFuncao);
       toast.success(status === "aceito" ? "Candidatura aprovada." : "Candidatura recusada.");
       await recarregar();
     },
@@ -127,6 +142,7 @@ export function useEscala(eventoId: string | undefined) {
     carregando,
     adicionarFuncao,
     atualizarVagas,
+    atualizarValorDiaria,
     removerFuncao,
     convidar,
     cancelarConviteEnviado,

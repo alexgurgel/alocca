@@ -48,12 +48,12 @@ export function AdicionarFuncaoDialog({
     formState: { errors, isSubmitting },
   } = useForm<EscalaFuncaoInput>({
     resolver: zodResolver(escalaFuncaoSchema),
-    defaultValues: { funcao_id: "", vagas: 1 },
+    defaultValues: { funcao_id: "", vagas: 1, valor_diaria: "" },
   });
 
   async function onSubmit(values: EscalaFuncaoInput) {
     await onAdicionar(values);
-    reset({ funcao_id: "", vagas: 1 });
+    reset({ funcao_id: "", vagas: 1, valor_diaria: "" });
     setOpen(false);
   }
 
@@ -100,6 +100,19 @@ export function AdicionarFuncaoDialog({
             <FieldLabel htmlFor="vagas">Quantidade de vagas</FieldLabel>
             <Input id="vagas" type="number" min={1} {...register("vagas", { valueAsNumber: true })} />
             <FieldError errors={[errors.vagas]} />
+          </Field>
+
+          <Field data-invalid={!!errors.valor_diaria}>
+            <FieldLabel htmlFor="valor_diaria">Valor da diária (R$)</FieldLabel>
+            <Input
+              id="valor_diaria"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Ex: 120,00"
+              {...register("valor_diaria")}
+            />
+            <FieldError errors={[errors.valor_diaria]} />
           </Field>
 
           <DialogFooter>

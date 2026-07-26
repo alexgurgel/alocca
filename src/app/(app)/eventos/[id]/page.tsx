@@ -11,7 +11,6 @@ import {
   Pencil,
   Trash2,
   User,
-  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,7 +28,7 @@ import { EscalaTab } from "@/components/escalas/escala-tab";
 import { CheckinList } from "@/components/checkin/checkin-list";
 import { createClient } from "@/lib/supabase/client";
 import { deleteEvento, getEvento } from "@/services/eventos.service";
-import { formatCurrencyBRL, formatDateTime } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import type { Evento } from "@/types";
 
 export default function EventoDetailPage() {
@@ -126,12 +125,6 @@ export default function EventoDetailPage() {
             <CalendarDays className="size-3.5" />
             {formatDateTime(evento.data_inicio)} — {formatDateTime(evento.data_fim)}
           </span>
-          {evento.valor_diaria_padrao ? (
-            <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Wallet className="size-3.5" />
-              Diária padrão: {formatCurrencyBRL(evento.valor_diaria_padrao)}
-            </span>
-          ) : null}
         </div>
 
         {evento.local || evento.endereco ? (

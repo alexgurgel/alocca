@@ -10,7 +10,6 @@ export interface EventoPublico {
   data_inicio: string;
   data_fim: string;
   observacoes: string | null;
-  valor_diaria_padrao: number | null;
   empresa_nome: string;
 }
 
@@ -18,6 +17,7 @@ export interface FuncaoDisponivel {
   funcao_id: string;
   nome: string;
   vagas_disponiveis: number;
+  valor_diaria: number | null;
 }
 
 export interface FuncionarioEncontrado {
@@ -80,6 +80,7 @@ export async function enviarInscricaoPublica(
     p_cidade: input.cidade,
     p_estado: input.estado,
     p_observacoes: input.observacoes || null,
+    p_aceite_lgpd: input.aceiteLgpd,
   });
   if (error) throw error;
   return data;

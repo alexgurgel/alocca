@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isCpfValido } from "@/lib/cpf";
+import { nomeCompletoSchema } from "./nome";
 
 export const cpfLookupSchema = z.object({
   cpf: z.string().refine(isCpfValido, "CPF inválido"),
@@ -9,7 +10,7 @@ export type CpfLookupInput = z.infer<typeof cpfLookupSchema>;
 
 export const inscricaoPublicaSchema = z.object({
   funcao_id: z.string().min(1, "Selecione uma função"),
-  nome: z.string().min(2, "Informe o nome completo"),
+  nome: nomeCompletoSchema,
   telefone: z
     .string()
     .refine((v) => v.replace(/\D/g, "").length >= 10, "Telefone inválido"),
@@ -18,6 +19,9 @@ export const inscricaoPublicaSchema = z.object({
   cidade: z.string().min(1, "Informe a cidade"),
   estado: z.string().min(2, "Selecione o estado"),
   observacoes: z.string().optional().or(z.literal("")),
+  aceiteLgpd: z.boolean().refine((v) => v === true, {
+    message: "É necessário aceitar os termos de privacidade para continuar.",
+  }),
 });
 
 export type InscricaoPublicaInput = z.infer<typeof inscricaoPublicaSchema>;

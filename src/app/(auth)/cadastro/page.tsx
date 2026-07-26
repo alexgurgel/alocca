@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
@@ -11,7 +11,9 @@ import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { LgpdConsentField } from "@/components/shared/lgpd-consent-field";
 import { cadastroSchema, type CadastroInput } from "@/lib/validations/auth.schema";
+import { normalizarNomeCompleto, removerNumeros } from "@/lib/validations/nome";
 import { createClient } from "@/lib/supabase/client";
 import { criarContaInicial } from "@/services/empresas.service";
 
@@ -23,8 +25,12 @@ export default function CadastroPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<CadastroInput>({ resolver: zodResolver(cadastroSchema) });
+  } = useForm<CadastroInput>({
+    resolver: zodResolver(cadastroSchema),
+    defaultValues: { aceiteLgpd: false },
+  });
 
   async function onSubmit(values: CadastroInput) {
     try {
@@ -33,7 +39,7 @@ export default function CadastroPage() {
         email: values.email,
         password: values.senha,
         options: {
-          data: { nome_empresa: values.nomeEmpresa, nome: values.nome },
+          data: { nome_empresa: values.nomeEmpresa, nome: values.nome, aceite_lgpd: values.aceiteLgpd },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -45,6 +51,7 @@ export default function CadastroPage() {
           nomeEmpresa: values.nomeEmpresa,
           nomeUsuario: values.nome,
           email: values.email,
+          aceiteLgpd: values.aceiteLgpd,
         });
         router.push("/painel");
         router.refresh();
@@ -97,7 +104,19 @@ export default function CadastroPage() {
 
         <Field data-invalid={!!errors.nome}>
           <FieldLabel htmlFor="nome">Seu nome completo</FieldLabel>
-          <Input id="nome" placeholder="Ex: Maria Silva" {...register("nome")} />
+          <Controller
+            control={control}
+            name="nome"
+            render={({ field }) => (
+              <Input
+                id="nome"
+                placeholder="Ex: Maria Silva"
+                value={field.value}
+                onChange={(e) => field.onChange(removerNumeros(e.target.value))}
+                onBlur={() => field.onChange(normalizarNomeCompleto(field.value ?? ""))}
+              />
+            )}
+          />
           <FieldError errors={[errors.nome]} />
         </Field>
 
@@ -147,6 +166,19 @@ export default function CadastroPage() {
           />
           <FieldError errors={[errors.confirmarSenha]} />
         </Field>
+
+        <Controller
+          control={control}
+          name="aceiteLgpd"
+          render={({ field }) => (
+            <LgpdConsentField
+              id="aceiteLgpd"
+              checked={field.value}
+              onCheckedChange={field.onChange}
+              error={errors.aceiteLgpd}
+            />
+          )}
+        />
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}

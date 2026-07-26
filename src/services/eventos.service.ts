@@ -78,7 +78,6 @@ function toPayload(input: EventoInput) {
     endereco: input.endereco || null,
     data_inicio: new Date(input.data_inicio).toISOString(),
     data_fim: new Date(input.data_fim).toISOString(),
-    valor_diaria_padrao: input.valor_diaria_padrao ? Number(input.valor_diaria_padrao) : null,
     observacoes: input.observacoes || null,
     status: input.status,
   };

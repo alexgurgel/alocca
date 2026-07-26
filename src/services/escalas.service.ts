@@ -37,7 +37,12 @@ export async function addFuncaoAoEvento(
 ) {
   const { data, error } = await supabase
     .from("evento_funcoes")
-    .insert({ evento_id: eventoId, funcao_id: input.funcao_id, vagas: input.vagas })
+    .insert({
+      evento_id: eventoId,
+      funcao_id: input.funcao_id,
+      vagas: input.vagas,
+      valor_diaria: Number(input.valor_diaria),
+    })
     .select("*, funcao:funcoes(*)")
     .single();
 
@@ -53,6 +58,22 @@ export async function updateVagasFuncaoEvento(
   const { data, error } = await supabase
     .from("evento_funcoes")
     .update({ vagas })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateValorDiariaFuncaoEvento(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  valorDiaria: number
+) {
+  const { data, error } = await supabase
+    .from("evento_funcoes")
+    .update({ valor_diaria: valorDiaria })
     .eq("id", id)
     .select("*")
     .single();

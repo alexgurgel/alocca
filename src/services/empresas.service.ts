@@ -4,12 +4,13 @@ import type { Empresa } from "@/types";
 
 export async function criarContaInicial(
   supabase: SupabaseClient<Database>,
-  params: { nomeEmpresa: string; nomeUsuario: string; email: string }
+  params: { nomeEmpresa: string; nomeUsuario: string; email: string; aceiteLgpd: boolean }
 ) {
   const { data, error } = await supabase.rpc("criar_empresa_e_perfil", {
     p_nome_empresa: params.nomeEmpresa,
     p_nome_usuario: params.nomeUsuario,
     p_email: params.email,
+    p_aceite_lgpd: params.aceiteLgpd,
   });
 
   if (error) throw error;

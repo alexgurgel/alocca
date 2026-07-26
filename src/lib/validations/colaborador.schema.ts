@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { nomeCompletoSchema } from "./nome";
 
 export const colaboradorSchema = z.object({
-  nome: z.string().min(2, "Informe o nome completo"),
+  nome: nomeCompletoSchema,
   cpf: z.string().optional().or(z.literal("")),
   telefone: z.string().optional().or(z.literal("")),
   email: z.string().email("E-mail inválido").optional().or(z.literal("")),

@@ -60,6 +60,7 @@ export interface Database {
           avatar_url: string | null;
           telefone: string | null;
           papel: PapelUsuario;
+          consentimento_lgpd_em: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -72,6 +73,7 @@ export interface Database {
           avatar_url?: string | null;
           telefone?: string | null;
           papel?: PapelUsuario;
+          consentimento_lgpd_em?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -93,6 +95,7 @@ export interface Database {
           foto_url: string | null;
           observacoes: string | null;
           status: StatusFuncionario;
+          consentimento_lgpd_em: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -110,6 +113,7 @@ export interface Database {
           foto_url?: string | null;
           observacoes?: string | null;
           status?: StatusFuncionario;
+          consentimento_lgpd_em?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -161,7 +165,6 @@ export interface Database {
           endereco: string | null;
           data_inicio: string;
           data_fim: string;
-          valor_diaria_padrao: number | null;
           observacoes: string | null;
           status: StatusEvento;
           inscricao_publica_ativa: boolean;
@@ -178,7 +181,6 @@ export interface Database {
           endereco?: string | null;
           data_inicio: string;
           data_fim: string;
-          valor_diaria_padrao?: number | null;
           observacoes?: string | null;
           status?: StatusEvento;
           inscricao_publica_ativa?: boolean;
@@ -194,6 +196,7 @@ export interface Database {
           evento_id: string;
           funcao_id: string;
           vagas: number;
+          valor_diaria: number | null;
           created_at: string;
         };
         Insert: {
@@ -201,6 +204,7 @@ export interface Database {
           evento_id: string;
           funcao_id: string;
           vagas?: number;
+          valor_diaria?: number | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["evento_funcoes"]["Insert"]>;
@@ -270,6 +274,7 @@ export interface Database {
           p_nome_empresa: string;
           p_nome_usuario: string;
           p_email: string;
+          p_aceite_lgpd: boolean;
         };
         Returns: Database["public"]["Tables"]["perfis"]["Row"];
       };
@@ -315,7 +320,6 @@ export interface Database {
           data_inicio: string;
           data_fim: string;
           observacoes: string | null;
-          valor_diaria_padrao: number | null;
           empresa_nome: string;
         }[];
       };
@@ -325,6 +329,7 @@ export interface Database {
           funcao_id: string;
           nome: string;
           vagas_disponiveis: number;
+          valor_diaria: number | null;
         }[];
       };
       buscar_funcionario_por_cpf: {
@@ -351,6 +356,7 @@ export interface Database {
           p_cidade: string;
           p_estado: string;
           p_observacoes: string | null;
+          p_aceite_lgpd: boolean;
         };
         Returns: string;
       };

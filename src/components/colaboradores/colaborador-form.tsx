@@ -21,6 +21,7 @@ import {
 import { FotoUpload } from "./foto-upload";
 import { FuncoesMultiselect } from "./funcoes-multiselect";
 import { colaboradorSchema, type ColaboradorInput } from "@/lib/validations/colaborador.schema";
+import { normalizarNomeCompleto, removerNumeros } from "@/lib/validations/nome";
 import { formatCPF, formatTelefone } from "@/lib/format";
 import { ESTADOS_BR } from "@/types";
 import type { Funcao, FuncionarioComFuncoes } from "@/types";
@@ -105,7 +106,19 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Field data-invalid={!!errors.nome} className="sm:col-span-2">
             <FieldLabel htmlFor="nome">Nome completo</FieldLabel>
-            <Input id="nome" placeholder="Ex: João da Silva" {...register("nome")} />
+            <Controller
+              control={control}
+              name="nome"
+              render={({ field }) => (
+                <Input
+                  id="nome"
+                  placeholder="Ex: João da Silva"
+                  value={field.value}
+                  onChange={(e) => field.onChange(removerNumeros(e.target.value))}
+                  onBlur={() => field.onChange(normalizarNomeCompleto(field.value ?? ""))}
+                />
+              )}
+            />
             <FieldError errors={[errors.nome]} />
           </Field>
 

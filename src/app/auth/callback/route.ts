@@ -27,6 +27,7 @@ export async function GET(request: Request) {
     const metadata = data.user.user_metadata as {
       nome_empresa?: string;
       nome?: string;
+      aceite_lgpd?: boolean;
     };
 
     if (metadata?.nome_empresa && metadata?.nome) {
@@ -34,6 +35,7 @@ export async function GET(request: Request) {
         p_nome_empresa: metadata.nome_empresa,
         p_nome_usuario: metadata.nome,
         p_email: data.user.email ?? "",
+        p_aceite_lgpd: metadata.aceite_lgpd === true,
       });
 
       if (rpcError) {

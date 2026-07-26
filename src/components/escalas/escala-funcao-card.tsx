@@ -18,32 +18,50 @@ interface EscalaFuncaoCardProps {
   empresaId: string;
   eventoNome: string;
   escala: EscalaFuncao;
-  valorPadrao?: number | null;
   onAtualizarVagas: (id: string, vagas: number) => Promise<void>;
+  onAtualizarValorDiaria: (id: string, valorDiaria: number) => Promise<void>;
   onRemoverFuncao: (id: string) => Promise<void>;
   onConvidar: (funcaoId: string, input: ConvidarColaboradorInput) => Promise<void>;
   onCancelarConvite: (conviteId: string) => Promise<void>;
-  onAvaliarCandidatura: (conviteId: string, status: "aceito" | "recusado") => Promise<void>;
+  onAvaliarCandidatura: (
+    conviteId: string,
+    status: "aceito" | "recusado",
+    valorDiariaFuncao: number | null
+  ) => Promise<void>;
 }
 
 export function EscalaFuncaoCard({
   empresaId,
   eventoNome,
   escala,
-  valorPadrao,
   onAtualizarVagas,
+  onAtualizarValorDiaria,
   onRemoverFuncao,
   onConvidar,
   onCancelarConvite,
   onAvaliarCandidatura,
 }: EscalaFuncaoCardProps) {
   const [confirmarRemover, setConfirmarRemover] = useState(false);
+  const [valorDiariaInput, setValorDiariaInput] = useState(
+    escala.valor_diaria != null ? String(escala.valor_diaria) : ""
+  );
   const preenchidas = escala.convites.filter((c) => c.status === "aceito").length;
 
   async function copiarLink(conviteId: string) {
     const link = getLinkConvite(conviteId);
     await navigator.clipboard.writeText(link);
     toast.success("Link do convite copiado.");
+  }
+
+  function salvarValorDiaria() {
+    const novoValor = Number(valorDiariaInput);
+    if (!novoValor || novoValor <= 0) {
+      setValorDiariaInput(escala.valor_diaria != null ? String(escala.valor_diaria) : "");
+      return;
+    }
+    if (novoValor !== escala.valor_diaria) {
+      onAtualizarValorDiaria(escala.id, novoValor);
+    }
   }
 
   return (
@@ -79,11 +97,26 @@ export function EscalaFuncaoCard({
             </Button>
           </div>
 
+          <label className="flex items-center gap-1.5 rounded-lg border border-border px-2 py-1 text-sm text-muted-foreground">
+            R$
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={valorDiariaInput}
+              onChange={(e) => setValorDiariaInput(e.target.value)}
+              onBlur={salvarValorDiaria}
+              placeholder="0,00"
+              className="w-16 bg-transparent text-right text-foreground outline-none"
+            />
+            <span className="text-xs">/diária</span>
+          </label>
+
           <ConvidarColaboradorDialog
             empresaId={empresaId}
             funcaoNome={escala.funcao.nome}
             idsJaConvidados={escala.convites.map((c) => c.funcionario_id)}
-            valorPadrao={valorPadrao}
+            valorPadrao={escala.valor_diaria}
             onConvidar={(input) => onConvidar(escala.funcao_id, input)}
           />
 
@@ -143,7 +176,7 @@ export function EscalaFuncaoCard({
                       size="icon-sm"
                       title="Aprovar candidatura"
                       className="text-muted-foreground hover:text-primary"
-                      onClick={() => onAvaliarCandidatura(convite.id, "aceito")}
+                      onClick={() => onAvaliarCandidatura(convite.id, "aceito", escala.valor_diaria)}
                     >
                       <Check className="size-3.5" />
                     </Button>
@@ -153,7 +186,7 @@ export function EscalaFuncaoCard({
                       size="icon-sm"
                       title="Recusar candidatura"
                       className="text-muted-foreground hover:text-destructive"
-                      onClick={() => onAvaliarCandidatura(convite.id, "recusado")}
+                      onClick={() => onAvaliarCandidatura(convite.id, "recusado", null)}
                     >
                       <X className="size-3.5" />
                     </Button>

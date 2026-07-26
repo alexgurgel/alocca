@@ -59,7 +59,6 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
       endereco: evento?.endereco ?? "",
       data_inicio: evento ? toDatetimeLocal(evento.data_inicio) : defaultDatetimeLocal(24),
       data_fim: evento ? toDatetimeLocal(evento.data_fim) : defaultDatetimeLocal(28),
-      valor_diaria_padrao: evento?.valor_diaria_padrao ? String(evento.valor_diaria_padrao) : "",
       observacoes: evento?.observacoes ?? "",
       status: evento?.status ?? "planejado",
     },
@@ -122,19 +121,6 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
             <FieldLabel htmlFor="data_fim">Fim</FieldLabel>
             <Input id="data_fim" type="datetime-local" {...register("data_fim")} />
             <FieldError errors={[errors.data_fim]} />
-          </Field>
-
-          <Field data-invalid={!!errors.valor_diaria_padrao}>
-            <FieldLabel htmlFor="valor_diaria_padrao">Valor de diária padrão (R$)</FieldLabel>
-            <Input
-              id="valor_diaria_padrao"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              {...register("valor_diaria_padrao")}
-            />
-            <FieldError errors={[errors.valor_diaria_padrao]} />
           </Field>
 
           <Field data-invalid={!!errors.status}>

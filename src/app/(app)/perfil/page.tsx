@@ -1,24 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppContext } from "@/components/providers/app-provider";
 import { PageHeader } from "@/components/shared/page-header";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FotoUpload } from "@/components/colaboradores/foto-upload";
 import { createClient } from "@/lib/supabase/client";
 import { atualizarPerfil } from "@/services/perfis.service";
 import { uploadFotoColaborador } from "@/services/storage.service";
+import { nomeCompletoSchema, normalizarNomeCompleto, removerNumeros } from "@/lib/validations/nome";
 
-interface PerfilFormValues {
-  nome: string;
-  telefone: string;
-}
+const perfilFormSchema = z.object({
+  nome: nomeCompletoSchema,
+  telefone: z.string().optional().or(z.literal("")),
+});
+
+type PerfilFormValues = z.infer<typeof perfilFormSchema>;
 
 export default function PerfilPage() {
   const { perfil } = useAppContext();
@@ -28,8 +33,10 @@ export default function PerfilPage() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    control,
+    formState: { errors, isSubmitting },
   } = useForm<PerfilFormValues>({
+    resolver: zodResolver(perfilFormSchema),
     defaultValues: { nome: perfil.nome, telefone: perfil.telefone ?? "" },
   });
 
@@ -69,9 +76,21 @@ export default function PerfilPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <Field className="sm:col-span-2">
+            <Field data-invalid={!!errors.nome} className="sm:col-span-2">
               <FieldLabel htmlFor="nome">Nome completo</FieldLabel>
-              <Input id="nome" {...register("nome")} />
+              <Controller
+                control={control}
+                name="nome"
+                render={({ field }) => (
+                  <Input
+                    id="nome"
+                    value={field.value}
+                    onChange={(e) => field.onChange(removerNumeros(e.target.value))}
+                    onBlur={() => field.onChange(normalizarNomeCompleto(field.value ?? ""))}
+                  />
+                )}
+              />
+              <FieldError errors={[errors.nome]} />
             </Field>
 
             <Field>

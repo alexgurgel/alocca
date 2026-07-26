@@ -8,7 +8,6 @@ export const eventoSchema = z
     endereco: z.string().optional().or(z.literal("")),
     data_inicio: z.string().min(1, "Informe a data/hora inicial"),
     data_fim: z.string().min(1, "Informe a data/hora final"),
-    valor_diaria_padrao: z.string().optional().or(z.literal("")),
     observacoes: z.string().optional().or(z.literal("")),
     status: z.enum(["planejado", "em_andamento", "finalizado", "cancelado"]),
   })

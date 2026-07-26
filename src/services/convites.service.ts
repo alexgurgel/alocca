@@ -88,6 +88,24 @@ export async function responderConvite(
   return data;
 }
 
+export async function avaliarCandidatura(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  status: "aceito" | "recusado",
+  valorDiariaFuncao: number | null
+) {
+  const { error } = await supabase
+    .from("convites")
+    .update({
+      status,
+      respondido_em: new Date().toISOString(),
+      ...(status === "aceito" ? { valor_diaria: valorDiariaFuncao } : {}),
+    })
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
 export interface ContePublico {
   id: string;
   status: "pendente" | "aceito" | "recusado";

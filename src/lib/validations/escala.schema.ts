@@ -3,6 +3,10 @@ import { z } from "zod";
 export const escalaFuncaoSchema = z.object({
   funcao_id: z.string().min(1, "Selecione uma função"),
   vagas: z.number().int().min(1, "Informe ao menos 1 vaga"),
+  valor_diaria: z
+    .string()
+    .min(1, "Informe o valor da diária")
+    .refine((v) => Number(v) > 0, "Informe um valor válido"),
 });
 
 export type EscalaFuncaoInput = z.infer<typeof escalaFuncaoSchema>;
