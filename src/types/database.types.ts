@@ -7,6 +7,7 @@
 export type StatusFuncionario = "ativo" | "inativo";
 export type StatusEvento = "planejado" | "em_andamento" | "finalizado" | "cancelado";
 export type StatusConvite = "pendente" | "aceito" | "recusado";
+export type OrigemConvite = "convite" | "candidatura";
 export type StatusCheckin = "pendente" | "presente" | "ausente" | "atrasado";
 export type PapelUsuario = "admin" | "colaborador";
 
@@ -163,6 +164,7 @@ export interface Database {
           valor_diaria_padrao: number | null;
           observacoes: string | null;
           status: StatusEvento;
+          inscricao_publica_ativa: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -179,6 +181,7 @@ export interface Database {
           valor_diaria_padrao?: number | null;
           observacoes?: string | null;
           status?: StatusEvento;
+          inscricao_publica_ativa?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -210,6 +213,7 @@ export interface Database {
           funcionario_id: string;
           funcao_id: string;
           status: StatusConvite;
+          origem: OrigemConvite;
           valor_diaria: number | null;
           observacoes: string | null;
           enviado_em: string;
@@ -222,6 +226,7 @@ export interface Database {
           funcionario_id: string;
           funcao_id: string;
           status?: StatusConvite;
+          origem?: OrigemConvite;
           valor_diaria?: number | null;
           observacoes?: string | null;
           enviado_em?: string;
@@ -295,6 +300,59 @@ export interface Database {
       responder_convite_publico: {
         Args: { p_id: string; p_status: string };
         Returns: undefined;
+      };
+      cpf_valido: {
+        Args: { p_cpf: string };
+        Returns: boolean;
+      };
+      evento_publico: {
+        Args: { p_evento_id: string };
+        Returns: {
+          id: string;
+          nome: string;
+          local: string | null;
+          endereco: string | null;
+          data_inicio: string;
+          data_fim: string;
+          observacoes: string | null;
+          valor_diaria_padrao: number | null;
+          empresa_nome: string;
+        }[];
+      };
+      funcoes_disponiveis_evento: {
+        Args: { p_evento_id: string };
+        Returns: {
+          funcao_id: string;
+          nome: string;
+          vagas_disponiveis: number;
+        }[];
+      };
+      buscar_funcionario_por_cpf: {
+        Args: { p_evento_id: string; p_cpf: string };
+        Returns: {
+          nome: string;
+          telefone: string | null;
+          email: string | null;
+          data_nascimento: string | null;
+          cidade: string | null;
+          estado: string | null;
+          observacoes: string | null;
+        }[];
+      };
+      inscricao_publica_evento: {
+        Args: {
+          p_evento_id: string;
+          p_funcao_id: string;
+          p_nome: string;
+          p_cpf: string;
+          p_telefone: string;
+          p_email: string;
+          p_data_nascimento: string;
+          p_cidade: string;
+          p_estado: string;
+          p_observacoes: string | null;
+        };
+        Returns: string;
       };
     };
     Enums: Record<string, never>;

@@ -116,6 +116,22 @@ export async function updateEvento(
   return data;
 }
 
+export async function toggleInscricaoPublica(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  ativa: boolean
+) {
+  const { data, error } = await supabase
+    .from("eventos")
+    .update({ inscricao_publica_ativa: ativa })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteEvento(supabase: SupabaseClient<Database>, id: string) {
   const { error } = await supabase.from("eventos").delete().eq("id", id);
   if (error) throw error;

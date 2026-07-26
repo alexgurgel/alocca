@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventoStatusBadge } from "@/components/eventos/evento-status-badge";
 import { PainelControle } from "@/components/eventos/painel-controle";
+import { InscricaoPublicaCard } from "@/components/eventos/inscricao-publica-card";
 import { EscalaTab } from "@/components/escalas/escala-tab";
 import { CheckinList } from "@/components/checkin/checkin-list";
 import { createClient } from "@/lib/supabase/client";
@@ -164,7 +165,8 @@ export default function EventoDetailPage() {
           <TabsTrigger value="checkin">Check-in</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="visao-geral" className="pt-4">
+        <TabsContent value="visao-geral" className="space-y-4 pt-4">
+          <InscricaoPublicaCard evento={evento} onAtualizado={setEvento} />
           <PainelControle painel={painel} carregando={carregandoPainel} />
         </TabsContent>
 

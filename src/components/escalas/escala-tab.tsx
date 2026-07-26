@@ -10,8 +10,16 @@ import { EscalaFuncaoCard } from "./escala-funcao-card";
 import type { Evento } from "@/types";
 
 export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Evento }) {
-  const { escala, carregando, adicionarFuncao, atualizarVagas, removerFuncao, convidar, cancelarConviteEnviado } =
-    useEscala(evento.id);
+  const {
+    escala,
+    carregando,
+    adicionarFuncao,
+    atualizarVagas,
+    removerFuncao,
+    convidar,
+    cancelarConviteEnviado,
+    avaliarCandidatura,
+  } = useEscala(evento.id);
   const { funcoes } = useFuncoes(empresaId);
 
   return (
@@ -54,6 +62,7 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
               onRemoverFuncao={removerFuncao}
               onConvidar={convidar}
               onCancelarConvite={cancelarConviteEnviado}
+              onAvaliarCandidatura={avaliarCandidatura}
             />
           ))}
         </div>

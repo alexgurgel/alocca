@@ -7,6 +7,7 @@ import type {
 } from "./database.types";
 
 export type {
+  OrigemConvite,
   StatusCheckin,
   StatusConvite,
   StatusEvento,

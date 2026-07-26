@@ -112,6 +112,16 @@ export function useEscala(eventoId: string | undefined) {
     [recarregar]
   );
 
+  const avaliarCandidatura = useCallback(
+    async (conviteId: string, status: "aceito" | "recusado") => {
+      const supabase = createClient();
+      await responderConvite(supabase, conviteId, status);
+      toast.success(status === "aceito" ? "Candidatura aprovada." : "Candidatura recusada.");
+      await recarregar();
+    },
+    [recarregar]
+  );
+
   return {
     escala,
     carregando,
@@ -121,6 +131,7 @@ export function useEscala(eventoId: string | undefined) {
     convidar,
     cancelarConviteEnviado,
     marcarResposta,
+    avaliarCandidatura,
     recarregar,
   };
 }

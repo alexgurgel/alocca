@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, MessageCircle, Minus, Plus, Trash2, X, Link2 } from "lucide-react";
+import { Check, Mail, MessageCircle, Minus, Plus, Trash2, X, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ interface EscalaFuncaoCardProps {
   onRemoverFuncao: (id: string) => Promise<void>;
   onConvidar: (funcaoId: string, input: ConvidarColaboradorInput) => Promise<void>;
   onCancelarConvite: (conviteId: string) => Promise<void>;
+  onAvaliarCandidatura: (conviteId: string, status: "aceito" | "recusado") => Promise<void>;
 }
 
 export function EscalaFuncaoCard({
@@ -34,6 +35,7 @@ export function EscalaFuncaoCard({
   onRemoverFuncao,
   onConvidar,
   onCancelarConvite,
+  onAvaliarCandidatura,
 }: EscalaFuncaoCardProps) {
   const [confirmarRemover, setConfirmarRemover] = useState(false);
   const preenchidas = escala.convites.filter((c) => c.status === "aceito").length;
@@ -109,9 +111,16 @@ export function EscalaFuncaoCard({
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {convite.funcionario.nome}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {convite.funcionario.nome}
+                    </p>
+                    {convite.origem === "candidatura" ? (
+                      <span className="shrink-0 rounded-full bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-medium text-cyan-600 dark:text-cyan-400">
+                        Candidatura
+                      </span>
+                    ) : null}
+                  </div>
                   {convite.valor_diaria ? (
                     <p className="text-xs text-muted-foreground">
                       {formatCurrencyBRL(convite.valor_diaria)}
@@ -125,6 +134,31 @@ export function EscalaFuncaoCard({
                   label={STATUS_CONVITE_LABEL[convite.status]}
                   tone={STATUS_CONVITE_TONE[convite.status]}
                 />
+
+                {convite.origem === "candidatura" && convite.status === "pendente" ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Aprovar candidatura"
+                      className="text-muted-foreground hover:text-primary"
+                      onClick={() => onAvaliarCandidatura(convite.id, "aceito")}
+                    >
+                      <Check className="size-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Recusar candidatura"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => onAvaliarCandidatura(convite.id, "recusado")}
+                    >
+                      <X className="size-3.5" />
+                    </Button>
+                  </>
+                ) : null}
 
                 <Button
                   type="button"
@@ -182,15 +216,18 @@ export function EscalaFuncaoCard({
                   <Mail className="size-3.5" />
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  onClick={() => onCancelarConvite(convite.id)}
-                >
-                  <X className="size-3.5" />
-                </Button>
+                {!(convite.origem === "candidatura" && convite.status === "pendente") ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    title="Remover"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => onCancelarConvite(convite.id)}
+                  >
+                    <X className="size-3.5" />
+                  </Button>
+                ) : null}
               </div>
             </li>
           ))}
