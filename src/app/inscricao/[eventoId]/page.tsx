@@ -234,9 +234,16 @@ export default function InscricaoPublicaPage() {
                     name="funcao_id"
                     render={({ field }) => (
                       <Select
-                        items={Object.fromEntries(funcoes.map((f) => [f.funcao_id, f.nome]))}
+                        items={Object.fromEntries(
+                          funcoes.map((f) => [
+                            f.funcao_id,
+                            `${f.nome} (${f.vagas_disponiveis} vaga${f.vagas_disponiveis === 1 ? "" : "s"})`,
+                          ])
+                        )}
                         value={field.value}
-                        onValueChange={field.onChange}
+                        onValueChange={(v: string | null) =>
+                          form.setValue("funcao_id", v ?? "", { shouldValidate: true, shouldDirty: true })
+                        }
                       >
                         <SelectTrigger id="funcao_id" className="w-full">
                           <SelectValue placeholder="Selecione a função" />
@@ -309,7 +316,9 @@ export default function InscricaoPublicaPage() {
                       <Select
                         items={Object.fromEntries(ESTADOS_BR.map((uf) => [uf, uf]))}
                         value={field.value}
-                        onValueChange={field.onChange}
+                        onValueChange={(v: string | null) =>
+                          form.setValue("estado", v ?? "", { shouldValidate: true, shouldDirty: true })
+                        }
                       >
                         <SelectTrigger id="estado" className="w-full">
                           <SelectValue placeholder="UF" />
