@@ -235,7 +235,7 @@ export default function InscricaoPublicaPage() {
                     render={({ field }) => (
                       <Select
                         items={Object.fromEntries(funcoes.map((f) => [f.funcao_id, f.nome]))}
-                        value={field.value || undefined}
+                        value={field.value}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger id="funcao_id" className="w-full">
@@ -308,7 +308,7 @@ export default function InscricaoPublicaPage() {
                     render={({ field }) => (
                       <Select
                         items={Object.fromEntries(ESTADOS_BR.map((uf) => [uf, uf]))}
-                        value={field.value || undefined}
+                        value={field.value}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger id="estado" className="w-full">

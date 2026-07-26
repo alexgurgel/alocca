@@ -169,7 +169,7 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
               render={({ field }) => (
                 <Select
                   items={Object.fromEntries(ESTADOS_BR.map((uf) => [uf, uf]))}
-                  value={field.value || undefined}
+                  value={field.value}
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger id="estado" className="w-full">
