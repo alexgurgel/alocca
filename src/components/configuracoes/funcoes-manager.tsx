@@ -20,7 +20,7 @@ export function FuncoesManager({ empresaId }: { empresaId: string | undefined })
         <div>
           <h3 className="text-sm font-semibold text-foreground">Funções cadastradas</h3>
           <p className="text-xs text-muted-foreground">
-            Cargos que podem ser atribuídos a colaboradores e escalados em eventos.
+            Cargos que podem ser atribuídos a freelancers e escalados em eventos.
           </p>
         </div>
         <FuncaoDialog onSalvar={criar} />
@@ -68,7 +68,7 @@ export function FuncoesManager({ empresaId }: { empresaId: string | undefined })
         open={!!paraExcluir}
         onOpenChange={(open) => !open && setParaExcluir(null)}
         title={`Remover a função "${paraExcluir?.nome}"?`}
-        description="Colaboradores e escalas que usam esta função perderão essa associação."
+        description="Freelancers e escalas que usam esta função perderão essa associação."
         confirmLabel="Remover"
         onConfirm={async () => {
           if (paraExcluir) await remover(paraExcluir.id);

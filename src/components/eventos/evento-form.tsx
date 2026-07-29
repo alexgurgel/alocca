@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { eventoSchema, type EventoInput } from "@/lib/validations/evento.schema";
+import { eventoSchema, novoEventoSchema, type EventoInput } from "@/lib/validations/evento.schema";
 import type { Evento } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { createEvento, updateEvento } from "@/services/eventos.service";
@@ -36,6 +36,10 @@ function defaultDatetimeLocal(horasOffset: number) {
   return toDatetimeLocal(date.toISOString());
 }
 
+function nowDatetimeLocal() {
+  return toDatetimeLocal(new Date().toISOString());
+}
+
 interface EventoFormProps {
   empresaId: string;
   criadoPor: string | null;
@@ -51,7 +55,7 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
     control,
     formState: { errors, isSubmitting },
   } = useForm<EventoInput>({
-    resolver: zodResolver(eventoSchema),
+    resolver: zodResolver(evento ? eventoSchema : novoEventoSchema),
     defaultValues: {
       nome: evento?.nome ?? "",
       cliente: evento?.cliente ?? "",
@@ -63,6 +67,8 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
       status: evento?.status ?? "planejado",
     },
   });
+
+  const dataInicioValue = useWatch({ control, name: "data_inicio" });
 
   async function onSubmit(values: EventoInput) {
     try {
@@ -113,13 +119,23 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
 
           <Field data-invalid={!!errors.data_inicio}>
             <FieldLabel htmlFor="data_inicio">Início</FieldLabel>
-            <Input id="data_inicio" type="datetime-local" {...register("data_inicio")} />
+            <Input
+              id="data_inicio"
+              type="datetime-local"
+              min={evento ? undefined : nowDatetimeLocal()}
+              {...register("data_inicio")}
+            />
             <FieldError errors={[errors.data_inicio]} />
           </Field>
 
           <Field data-invalid={!!errors.data_fim}>
             <FieldLabel htmlFor="data_fim">Fim</FieldLabel>
-            <Input id="data_fim" type="datetime-local" {...register("data_fim")} />
+            <Input
+              id="data_fim"
+              type="datetime-local"
+              min={dataInicioValue || undefined}
+              {...register("data_fim")}
+            />
             <FieldError errors={[errors.data_fim]} />
           </Field>
 

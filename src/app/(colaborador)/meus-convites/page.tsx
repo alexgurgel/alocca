@@ -39,7 +39,7 @@ export default function MeusConvitesPage() {
       ) : !perfil.funcionario_id ? (
         <EmptyState
           icon={MailX}
-          title="Sua conta ainda não está vinculada a um colaborador"
+          title="Sua conta ainda não está vinculada a um freelancer"
           description="Fale com o produtor responsável para vincular seu acesso."
         />
       ) : convites.length === 0 ? (

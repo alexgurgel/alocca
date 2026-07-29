@@ -117,6 +117,7 @@ export function EscalaFuncaoCard({
             funcaoNome={escala.funcao.nome}
             idsJaConvidados={escala.convites.map((c) => c.funcionario_id)}
             valorPadrao={escala.valor_diaria}
+            vagasPreenchidas={preenchidas >= escala.vagas}
             onConvidar={(input) => onConvidar(escala.funcao_id, input)}
           />
 
@@ -267,7 +268,7 @@ export function EscalaFuncaoCard({
         </ul>
       ) : (
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
-          Nenhum colaborador convidado para esta função ainda.
+          Nenhum freelancer convidado para esta função ainda.
         </p>
       )}
 

@@ -6,7 +6,7 @@ const DESTAQUES = [
   {
     icon: Users2,
     titulo: "Equipe sempre organizada",
-    descricao: "Cadastre colaboradores, funções e monte escalas em minutos.",
+    descricao: "Cadastre freelancers, funções e monte escalas em minutos.",
   },
   {
     icon: CalendarCheck2,

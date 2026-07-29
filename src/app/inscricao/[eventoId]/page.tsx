@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
-import { formatCPF, formatCurrencyBRL, formatDateTime, formatTelefone } from "@/lib/format";
+import { formatCPF, formatDateTime, formatTelefone } from "@/lib/format";
 import { normalizarNomeCompleto, removerNumeros } from "@/lib/validations/nome";
 import { ESTADOS_BR } from "@/types";
 import {
@@ -44,8 +44,7 @@ type Etapa = "cpf" | "formulario" | "sucesso";
 
 function descricaoFuncao(f: FuncaoDisponivel) {
   const vagas = `${f.vagas_disponiveis} vaga${f.vagas_disponiveis === 1 ? "" : "s"}`;
-  const diaria = f.valor_diaria != null ? `${formatCurrencyBRL(f.valor_diaria)}/diária` : "";
-  return [f.nome, diaria, `(${vagas})`].filter(Boolean).join(" — ");
+  return `${f.nome} (${vagas})`;
 }
 
 export default function InscricaoPublicaPage() {
@@ -83,6 +82,7 @@ export default function InscricaoPublicaPage() {
       data_nascimento: "",
       cidade: "",
       estado: "",
+      chave_pix: "",
       observacoes: "",
       aceiteLgpd: false,
     },
@@ -103,6 +103,7 @@ export default function InscricaoPublicaPage() {
           data_nascimento: encontrado.data_nascimento ?? "",
           cidade: encontrado.cidade ?? "",
           estado: encontrado.estado ?? "",
+          chave_pix: encontrado.chave_pix ?? "",
           observacoes: encontrado.observacoes ?? "",
           aceiteLgpd: false,
         });
@@ -139,7 +140,7 @@ export default function InscricaoPublicaPage() {
           <EmptyState
             icon={ShieldOff}
             title="Inscrições encerradas"
-            description="Esse link não está mais aceitando candidaturas, ou o evento não existe."
+            description="Esse link não está mais aceitando candidaturas."
           />
         ) : etapa === "sucesso" ? (
           <div className="space-y-4 text-center">
@@ -343,6 +344,16 @@ export default function InscricaoPublicaPage() {
                     )}
                   />
                   <FieldError errors={[form.formState.errors.estado]} />
+                </Field>
+
+                <Field data-invalid={!!form.formState.errors.chave_pix}>
+                  <FieldLabel htmlFor="chave_pix">Chave PIX</FieldLabel>
+                  <Input
+                    id="chave_pix"
+                    placeholder="CPF, e-mail, telefone ou chave aleatória"
+                    {...form.register("chave_pix")}
+                  />
+                  <FieldError errors={[form.formState.errors.chave_pix]} />
                 </Field>
 
                 <Field>

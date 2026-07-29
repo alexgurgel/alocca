@@ -27,7 +27,7 @@ export function ColaboradoresAtivosList({
       <EmptyState
         icon={Trophy}
         title="Nenhum evento confirmado ainda"
-        description="O ranking aparece assim que colaboradores aceitarem convites."
+        description="O ranking aparece assim que freelancers aceitarem convites."
       />
     );
   }

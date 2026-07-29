@@ -100,12 +100,22 @@ export function useEscala(eventoId: string | undefined) {
   const convidar = useCallback(
     async (funcaoId: string, input: ConvidarColaboradorInput) => {
       if (!eventoId) return;
+      const funcaoEscalada = escala.find((e) => e.funcao_id === funcaoId);
+      if (funcaoEscalada) {
+        const preenchidas = funcaoEscalada.convites.filter((c) => c.status === "aceito").length;
+        if (preenchidas >= funcaoEscalada.vagas) {
+          toast.error(`As vagas de ${funcaoEscalada.funcao.nome} já estão 100% preenchidas.`);
+          return;
+        }
+      }
       const supabase = createClient();
       await enviarConvite(supabase, eventoId, funcaoId, input);
-      toast.success("Convite enviado ao colaborador.");
+      toast.success(
+        input.funcionario_ids.length > 1 ? "Convites enviados aos freelancers." : "Convite enviado ao freelancer."
+      );
       await recarregar();
     },
-    [eventoId, recarregar]
+    [eventoId, escala, recarregar]
   );
 
   const cancelarConviteEnviado = useCallback(

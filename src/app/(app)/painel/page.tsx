@@ -37,14 +37,14 @@ export default function PainelPage() {
           loading={carregando}
         />
         <StatCard
-          label="Colaboradores ativos"
+          label="Freelancers ativos"
           value={indicadores?.colaboradoresAtivos ?? 0}
           icon={Users}
           tone="blue"
           loading={carregando}
         />
         <StatCard
-          label="Colaboradores convocados"
+          label="Freelancers convocados"
           value={indicadores?.colaboradoresConvocados ?? 0}
           icon={UsersRound}
           tone="cyan"
@@ -66,7 +66,7 @@ export default function PainelPage() {
           <EventosPorMesChart dados={eventosPorMes} carregando={carregando} />
         </div>
         <div className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:col-span-2">
-          <h3 className="mb-1 text-sm font-semibold text-foreground">Colaboradores por função</h3>
+          <h3 className="mb-1 text-sm font-semibold text-foreground">Freelancers por função</h3>
           <p className="mb-4 text-xs text-muted-foreground">Distribuição da equipe cadastrada</p>
           <ColaboradoresPorFuncaoChart dados={colaboradoresPorFuncao} carregando={carregando} />
         </div>

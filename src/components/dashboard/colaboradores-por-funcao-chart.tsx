@@ -19,7 +19,7 @@ function ChartTooltip({
     <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-md">
       <p className="font-medium text-foreground">{item.funcao}</p>
       <p className="text-muted-foreground">
-        {item.quantidade} colaborador{item.quantidade === 1 ? "" : "es"}
+        {item.quantidade} freelancer{item.quantidade === 1 ? "" : "s"}
       </p>
     </div>
   );
@@ -38,8 +38,8 @@ export function ColaboradoresPorFuncaoChart({
     return (
       <EmptyState
         icon={Users}
-        title="Nenhum colaborador com função"
-        description="Atribua funções aos colaboradores para ver a distribuição aqui."
+        title="Nenhum freelancer com função"
+        description="Atribua funções aos freelancers para ver a distribuição aqui."
       />
     );
   }

@@ -17,7 +17,6 @@ export interface FuncaoDisponivel {
   funcao_id: string;
   nome: string;
   vagas_disponiveis: number;
-  valor_diaria: number | null;
 }
 
 export interface FuncionarioEncontrado {
@@ -27,6 +26,7 @@ export interface FuncionarioEncontrado {
   data_nascimento: string | null;
   cidade: string | null;
   estado: string | null;
+  chave_pix: string | null;
   observacoes: string | null;
 }
 
@@ -79,6 +79,7 @@ export async function enviarInscricaoPublica(
     p_data_nascimento: input.data_nascimento,
     p_cidade: input.cidade,
     p_estado: input.estado,
+    p_chave_pix: input.chave_pix,
     p_observacoes: input.observacoes || null,
     p_aceite_lgpd: input.aceiteLgpd,
   });

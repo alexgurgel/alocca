@@ -93,6 +93,7 @@ export interface Database {
           cidade: string | null;
           estado: string | null;
           foto_url: string | null;
+          chave_pix: string | null;
           observacoes: string | null;
           status: StatusFuncionario;
           consentimento_lgpd_em: string | null;
@@ -111,6 +112,7 @@ export interface Database {
           cidade?: string | null;
           estado?: string | null;
           foto_url?: string | null;
+          chave_pix?: string | null;
           observacoes?: string | null;
           status?: StatusFuncionario;
           consentimento_lgpd_em?: string | null;
@@ -329,7 +331,6 @@ export interface Database {
           funcao_id: string;
           nome: string;
           vagas_disponiveis: number;
-          valor_diaria: number | null;
         }[];
       };
       buscar_funcionario_por_cpf: {
@@ -341,6 +342,7 @@ export interface Database {
           data_nascimento: string | null;
           cidade: string | null;
           estado: string | null;
+          chave_pix: string | null;
           observacoes: string | null;
         }[];
       };
@@ -355,6 +357,7 @@ export interface Database {
           p_data_nascimento: string;
           p_cidade: string;
           p_estado: string;
+          p_chave_pix: string;
           p_observacoes: string | null;
           p_aceite_lgpd: boolean;
         };

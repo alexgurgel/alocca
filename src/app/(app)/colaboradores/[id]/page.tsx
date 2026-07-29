@@ -47,14 +47,14 @@ export default function EditarColaboradorPage() {
     return (
       <EmptyState
         icon={UserX}
-        title="Colaborador não encontrado"
+        title="Freelancer não encontrado"
         description="Ele pode ter sido removido."
         action={
           <button
             onClick={() => router.push("/colaboradores")}
             className="text-sm font-medium text-primary hover:underline"
           >
-            Voltar para colaboradores
+            Voltar para freelancers
           </button>
         }
       />
@@ -63,7 +63,7 @@ export default function EditarColaboradorPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={colaborador.nome} description="Edite os dados do colaborador." />
+      <PageHeader title={colaborador.nome} description="Edite os dados do freelancer." />
       <div className="mx-auto max-w-3xl">
         <ColaboradorForm
           empresaId={perfil.empresa_id ?? ""}

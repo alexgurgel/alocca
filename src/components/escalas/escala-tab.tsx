@@ -29,7 +29,7 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
         <div>
           <h3 className="text-sm font-semibold text-foreground">Escala do evento</h3>
           <p className="text-xs text-muted-foreground">
-            Defina as funções necessárias e convide colaboradores para cada uma.
+            Defina as funções necessárias e convide freelancers para cada uma.
           </p>
         </div>
         <AdicionarFuncaoDialog

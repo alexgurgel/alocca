@@ -142,6 +142,7 @@ export async function createFuncionario(
       data_nascimento: input.data_nascimento || null,
       cidade: input.cidade || null,
       estado: input.estado || null,
+      chave_pix: input.chave_pix || null,
       observacoes: input.observacoes || null,
       status: input.status,
       foto_url: fotoUrl || null,
@@ -170,6 +171,7 @@ export async function updateFuncionario(
     data_nascimento: input.data_nascimento || null,
     cidade: input.cidade || null,
     estado: input.estado || null,
+    chave_pix: input.chave_pix || null,
     observacoes: input.observacoes || null,
     status: input.status,
   };

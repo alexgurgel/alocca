@@ -12,7 +12,7 @@ export default function NovoColaboradorPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Novo colaborador" description="Cadastre um novo membro da equipe." />
+      <PageHeader title="Novo freelancer" description="Cadastre um novo membro da equipe." />
       <div className="mx-auto max-w-3xl">
         <ColaboradorForm empresaId={empresaId} funcoes={funcoes} />
       </div>
