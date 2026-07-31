@@ -18,6 +18,7 @@ export const inscricaoPublicaSchema = z.object({
   data_nascimento: z.string().min(1, "Informe a data de nascimento"),
   cidade: z.string().min(1, "Informe a cidade"),
   estado: z.string().min(2, "Selecione o estado"),
+  chave_pix: z.string().min(1, "Informe sua chave PIX"),
   observacoes: z.string().optional().or(z.literal("")),
   aceiteLgpd: z.boolean().refine((v) => v === true, {
     message: "É necessário aceitar os termos de privacidade para continuar.",

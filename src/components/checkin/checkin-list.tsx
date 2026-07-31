@@ -33,8 +33,8 @@ export function CheckinList({ eventoId }: { eventoId: string }) {
     return (
       <EmptyState
         icon={UserRoundCheck}
-        title="Nenhum colaborador convocado"
-        description="Convide colaboradores na escala do evento para que apareçam aqui no dia do check-in."
+        title="Nenhum freelancer convocado"
+        description="Convide freelancers na escala do evento para que apareçam aqui no dia do check-in."
       />
     );
   }

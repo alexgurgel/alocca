@@ -30,7 +30,7 @@ export default function EscalasPage() {
     <div className="space-y-6">
       <PageHeader
         title="Escalas"
-        description="Escolha um evento para montar a escala de colaboradores."
+        description="Escolha um evento para montar a escala de freelancers."
       />
 
       <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">

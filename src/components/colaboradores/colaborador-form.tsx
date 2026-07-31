@@ -56,6 +56,7 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
       data_nascimento: colaborador?.data_nascimento ?? "",
       cidade: colaborador?.cidade ?? "",
       estado: colaborador?.estado ?? "",
+      chave_pix: colaborador?.chave_pix ?? "",
       observacoes: colaborador?.observacoes ?? "",
       status: colaborador?.status ?? "ativo",
       funcao_ids: colaborador?.funcoes.map((f) => f.id) ?? [],
@@ -81,16 +82,16 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
 
       if (colaborador) {
         await updateFuncionario(supabase, colaborador.id, values, fotoUrl);
-        toast.success("Colaborador atualizado.");
+        toast.success("Freelancer atualizado.");
       } else {
         await createFuncionario(supabase, empresaId, values, fotoUrl);
-        toast.success("Colaborador cadastrado.");
+        toast.success("Freelancer cadastrado.");
       }
 
       router.push("/colaboradores");
       router.refresh();
     } catch {
-      toast.error("Não foi possível salvar o colaborador.");
+      toast.error("Não foi possível salvar o freelancer.");
     }
   }
 
@@ -164,7 +165,7 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
 
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="email">E-mail</FieldLabel>
-            <Input id="email" type="email" placeholder="colaborador@email.com" {...register("email")} />
+            <Input id="email" type="email" placeholder="freelancer@email.com" {...register("email")} />
             <FieldError errors={[errors.email]} />
           </Field>
 
@@ -199,6 +200,12 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
               )}
             />
             <FieldError errors={[errors.estado]} />
+          </Field>
+
+          <Field data-invalid={!!errors.chave_pix} className="sm:col-span-2">
+            <FieldLabel htmlFor="chave_pix">Chave PIX</FieldLabel>
+            <Input id="chave_pix" placeholder="CPF, e-mail, telefone ou chave aleatória" {...register("chave_pix")} />
+            <FieldError errors={[errors.chave_pix]} />
           </Field>
         </div>
       </div>
@@ -249,7 +256,7 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
             <Textarea
               id="observacoes"
               rows={3}
-              placeholder="Informações adicionais sobre o colaborador"
+              placeholder="Informações adicionais sobre o freelancer"
               {...register("observacoes")}
             />
           </Field>
@@ -267,7 +274,7 @@ export function ColaboradorForm({ empresaId, funcoes, colaborador }: Colaborador
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-          {colaborador ? "Salvar alterações" : "Cadastrar colaborador"}
+          {colaborador ? "Salvar alterações" : "Cadastrar freelancer"}
         </Button>
       </div>
     </form>

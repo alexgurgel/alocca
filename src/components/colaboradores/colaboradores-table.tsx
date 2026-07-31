@@ -84,8 +84,8 @@ export function ColaboradoresTable({
     return (
       <EmptyState
         icon={UserRound}
-        title="Nenhum colaborador encontrado"
-        description="Ajuste os filtros ou cadastre um novo colaborador para começar."
+        title="Nenhum freelancer encontrado"
+        description="Ajuste os filtros ou cadastre um novo freelancer para começar."
       />
     );
   }

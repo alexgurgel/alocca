@@ -12,7 +12,7 @@ export const escalaFuncaoSchema = z.object({
 export type EscalaFuncaoInput = z.infer<typeof escalaFuncaoSchema>;
 
 export const convidarColaboradorSchema = z.object({
-  funcionario_id: z.string().min(1, "Selecione um colaborador"),
+  funcionario_ids: z.array(z.string()).min(1, "Selecione ao menos um freelancer"),
   valor_diaria: z.string().optional().or(z.literal("")),
   observacoes: z.string().optional().or(z.literal("")),
 });

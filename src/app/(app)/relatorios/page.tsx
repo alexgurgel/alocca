@@ -30,7 +30,7 @@ export default function RelatoriosPage() {
           loading={carregando}
         />
         <StatCard
-          label="Colaboradores ativos"
+          label="Freelancers ativos"
           value={resumo?.totalColaboradoresAtivos ?? 0}
           icon={Users}
           tone="purple"
@@ -60,7 +60,7 @@ export default function RelatoriosPage() {
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-1 text-sm font-semibold text-foreground">Colaboradores mais convocados</h3>
+          <h3 className="mb-1 text-sm font-semibold text-foreground">Freelancers mais convocados</h3>
           <p className="mb-4 text-xs text-muted-foreground">Ranking por eventos confirmados</p>
           <ColaboradoresAtivosList dados={colaboradoresAtivos} carregando={carregando} />
         </div>

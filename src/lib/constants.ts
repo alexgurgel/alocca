@@ -55,7 +55,7 @@ export const TONE_CLASSES: Record<BadgeTone, string> = {
 export const NAV_ITEMS = [
   { label: "Painel", href: "/painel", icon: "LayoutDashboard" },
   { label: "Eventos", href: "/eventos", icon: "CalendarDays" },
-  { label: "Colaboradores", href: "/colaboradores", icon: "Users" },
+  { label: "Freelancers", href: "/colaboradores", icon: "Users" },
   { label: "Escalas", href: "/escalas", icon: "ClipboardList" },
   { label: "Check-in", href: "/checkin", icon: "QrCode" },
   { label: "Relatórios", href: "/relatorios", icon: "BarChart3" },

@@ -53,15 +53,16 @@ export async function enviarConvite(
 ) {
   const { data, error } = await supabase
     .from("convites")
-    .insert({
-      evento_id: eventoId,
-      funcao_id: funcaoId,
-      funcionario_id: input.funcionario_id,
-      valor_diaria: input.valor_diaria ? Number(input.valor_diaria) : null,
-      observacoes: input.observacoes || null,
-    })
-    .select("*, funcionario:funcionarios(*), funcao:funcoes(*)")
-    .single();
+    .insert(
+      input.funcionario_ids.map((funcionarioId) => ({
+        evento_id: eventoId,
+        funcao_id: funcaoId,
+        funcionario_id: funcionarioId,
+        valor_diaria: input.valor_diaria ? Number(input.valor_diaria) : null,
+        observacoes: input.observacoes || null,
+      }))
+    )
+    .select("*, funcionario:funcionarios(*), funcao:funcoes(*)");
 
   if (error) throw error;
   return data;

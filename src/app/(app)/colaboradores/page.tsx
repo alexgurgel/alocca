@@ -49,22 +49,22 @@ export default function ColaboradoresPage() {
     try {
       const supabase = createClient();
       await deleteFuncionario(supabase, paraExcluir.id);
-      toast.success("Colaborador removido.");
+      toast.success("Freelancer removido.");
       await recarregar();
     } catch {
-      toast.error("Não foi possível remover o colaborador.");
+      toast.error("Não foi possível remover o freelancer.");
     }
   }
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Colaboradores"
+        title="Freelancers"
         description="Gerencie a equipe disponível para escalar em seus eventos."
         actions={
           <Button render={<Link href="/colaboradores/novo" />}>
             <Plus />
-            Novo colaborador
+            Novo freelancer
           </Button>
         }
       />
@@ -97,7 +97,7 @@ export default function ColaboradoresPage() {
       <ConfirmDialog
         open={!!paraExcluir}
         onOpenChange={(open) => !open && setParaExcluir(null)}
-        title={`Remover ${paraExcluir?.nome ?? "colaborador"}?`}
+        title={`Remover ${paraExcluir?.nome ?? "freelancer"}?`}
         description="Essa ação não pode ser desfeita. O histórico de convites e check-ins associados também será removido."
         confirmLabel="Remover"
         onConfirm={handleExcluir}

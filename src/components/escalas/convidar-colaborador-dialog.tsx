@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, Loader2, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +17,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -40,6 +41,7 @@ interface ConvidarColaboradorDialogProps {
   funcaoNome: string;
   idsJaConvidados: string[];
   valorPadrao?: number | null;
+  vagasPreenchidas?: boolean;
   onConvidar: (input: ConvidarColaboradorInput) => Promise<void>;
 }
 
@@ -48,21 +50,22 @@ export function ConvidarColaboradorDialog({
   funcaoNome,
   idsJaConvidados,
   valorPadrao,
+  vagasPreenchidas = false,
   onConvidar,
 }: ConvidarColaboradorDialogProps) {
   const [open, setOpen] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
-  const [colaboradores, setColaboradores] = useState<Funcionario[]>([]);
+  const [freelancers, setFreelancers] = useState<Funcionario[]>([]);
 
   useEffect(() => {
     if (!open) return;
     const supabase = createClient();
-    listFuncionariosAtivos(supabase, empresaId).then(setColaboradores);
+    listFuncionariosAtivos(supabase, empresaId).then(setFreelancers);
   }, [open, empresaId]);
 
   const disponiveis = useMemo(
-    () => colaboradores.filter((c) => !idsJaConvidados.includes(c.id)),
-    [colaboradores, idsJaConvidados]
+    () => freelancers.filter((c) => !idsJaConvidados.includes(c.id)),
+    [freelancers, idsJaConvidados]
   );
 
   const {
@@ -74,73 +77,94 @@ export function ConvidarColaboradorDialog({
   } = useForm<ConvidarColaboradorInput>({
     resolver: zodResolver(convidarColaboradorSchema),
     defaultValues: {
-      funcionario_id: "",
+      funcionario_ids: [],
       valor_diaria: valorPadrao ? String(valorPadrao) : "",
       observacoes: "",
     },
   });
 
-  const funcionarioIdSelecionado = useWatch({ control, name: "funcionario_id" });
-  const funcionarioSelecionado = colaboradores.find((c) => c.id === funcionarioIdSelecionado);
+  const idsSelecionados = useWatch({ control, name: "funcionario_ids" }) ?? [];
+  const freelancersSelecionados = freelancers.filter((c) => idsSelecionados.includes(c.id));
+
+  function handleAbrir() {
+    if (vagasPreenchidas) {
+      toast.error(`As vagas de ${funcaoNome} já estão 100% preenchidas.`);
+      return;
+    }
+    setOpen(true);
+  }
 
   async function onSubmit(values: ConvidarColaboradorInput) {
     await onConvidar(values);
-    reset({ funcionario_id: "", valor_diaria: valorPadrao ? String(valorPadrao) : "", observacoes: "" });
+    reset({ funcionario_ids: [], valor_diaria: valorPadrao ? String(valorPadrao) : "", observacoes: "" });
     setOpen(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" variant="outline" />}>
+      <Button type="button" size="sm" variant="outline" onClick={handleAbrir}>
         <UserPlus />
         Convidar
-      </DialogTrigger>
+      </Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Convidar colaborador · {funcaoNome}</DialogTitle>
+          <DialogTitle>Convidar freelancer · {funcaoNome}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Field data-invalid={!!errors.funcionario_id}>
-            <FieldLabel>Colaborador</FieldLabel>
+          <Field data-invalid={!!errors.funcionario_ids}>
+            <FieldLabel>Freelancers</FieldLabel>
             <Controller
               control={control}
-              name="funcionario_id"
+              name="funcionario_ids"
               render={({ field }) => (
                 <Popover open={comboOpen} onOpenChange={setComboOpen}>
                   <PopoverTrigger
                     render={
-                      <Button type="button" variant="outline" className="w-full justify-between font-normal" />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-auto min-h-9 w-full justify-between font-normal"
+                      />
                     }
                   >
-                    {funcionarioSelecionado ? funcionarioSelecionado.nome : (
-                      <span className="text-muted-foreground">Selecione um colaborador</span>
-                    )}
+                    <span className="flex flex-wrap items-center gap-1 text-left">
+                      {freelancersSelecionados.length === 0 ? (
+                        <span className="text-muted-foreground">Selecione um ou mais freelancers</span>
+                      ) : (
+                        freelancersSelecionados.map((f) => (
+                          <Badge key={f.id} variant="secondary" className="font-normal">
+                            {f.nome}
+                          </Badge>
+                        ))
+                      )}
+                    </span>
                     <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
                   </PopoverTrigger>
                   <PopoverContent className="w-(--anchor-width) p-0" align="start">
                     <Command>
-                      <CommandInput placeholder="Buscar colaborador..." />
+                      <CommandInput placeholder="Buscar freelancer..." />
                       <CommandList>
-                        <CommandEmpty>Nenhum colaborador disponível.</CommandEmpty>
+                        <CommandEmpty>Nenhum freelancer disponível.</CommandEmpty>
                         <CommandGroup>
-                          {disponiveis.map((colaborador) => (
-                            <CommandItem
-                              key={colaborador.id}
-                              onSelect={() => {
-                                field.onChange(colaborador.id);
-                                setComboOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "size-4",
-                                  field.value === colaborador.id ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {colaborador.nome}
-                            </CommandItem>
-                          ))}
+                          {disponiveis.map((freelancer) => {
+                            const marcado = field.value?.includes(freelancer.id) ?? false;
+                            return (
+                              <CommandItem
+                                key={freelancer.id}
+                                onSelect={() => {
+                                  field.onChange(
+                                    marcado
+                                      ? field.value.filter((id: string) => id !== freelancer.id)
+                                      : [...(field.value ?? []), freelancer.id]
+                                  );
+                                }}
+                              >
+                                <Check className={cn("size-4", marcado ? "opacity-100" : "opacity-0")} />
+                                {freelancer.nome}
+                              </CommandItem>
+                            );
+                          })}
                         </CommandGroup>
                       </CommandList>
                     </Command>
@@ -148,7 +172,7 @@ export function ConvidarColaboradorDialog({
                 </Popover>
               )}
             />
-            <FieldError errors={[errors.funcionario_id]} />
+            <FieldError errors={[errors.funcionario_ids]} />
           </Field>
 
           <Field data-invalid={!!errors.valor_diaria}>

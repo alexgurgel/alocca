@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Alocca — Gestão operacional para produtores de eventos",
   description:
-    "Plataforma para produtores de eventos gerenciarem colaboradores, escalas, convites e check-in em um só lugar.",
+    "Plataforma para produtores de eventos gerenciarem freelancers, escalas, convites e check-in em um só lugar.",
 };
 
 export default function RootLayout({
