@@ -8,13 +8,21 @@ import { Logo } from "@/components/shared/logo";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createClient } from "@/lib/supabase/client";
-import { formatDateTime, slugify } from "@/lib/format";
+import { formatCPF, formatDate, formatDateTime, formatTelefone, slugify } from "@/lib/format";
 import { exportarPdf } from "@/lib/export/pdf";
 import { exportarExcel } from "@/lib/export/excel";
 import {
@@ -25,6 +33,20 @@ import {
 } from "@/services/lista-confirmados.service";
 
 const INTERVALO_ATUALIZACAO_MS = 5000;
+
+const COLUNAS_EXPORTACAO = ["Nome completo", "Função", "CPF", "Data de nascimento", "Telefone", "E-mail", "Chave PIX"];
+
+function linhaExportacao(c: FreelancerConfirmado) {
+  return [
+    c.nome,
+    c.funcao_nome,
+    formatCPF(c.cpf) || "—",
+    formatDate(c.data_nascimento) ,
+    formatTelefone(c.telefone) || "—",
+    c.email || "—",
+    c.chave_pix || "—",
+  ];
+}
 
 export default function ListaConfirmadosPublicaPage() {
   const params = useParams<{ eventoId: string }>();
@@ -59,8 +81,8 @@ export default function ListaConfirmadosPublicaPage() {
     exportarPdf({
       titulo: `Freelancers confirmados — ${info.nome}`,
       subtitulo: `${info.empresa_nome} · gerado em ${formatDateTime(new Date())}`,
-      colunas: ["Freelancer", "Função"],
-      linhas: confirmados.map((c) => [c.nome, c.funcao_nome]),
+      colunas: COLUNAS_EXPORTACAO,
+      linhas: confirmados.map(linhaExportacao),
       nomeArquivo: `confirmados-${slugify(info.nome)}.pdf`,
     });
   }
@@ -69,8 +91,8 @@ export default function ListaConfirmadosPublicaPage() {
     if (!info) return;
     exportarExcel({
       nomeAba: "Confirmados",
-      colunas: ["Freelancer", "Função"],
-      linhas: confirmados.map((c) => [c.nome, c.funcao_nome]),
+      colunas: COLUNAS_EXPORTACAO,
+      linhas: confirmados.map(linhaExportacao),
       nomeArquivo: `confirmados-${slugify(info.nome)}.xlsx`,
     });
   }
@@ -79,7 +101,7 @@ export default function ListaConfirmadosPublicaPage() {
     <div className="flex min-h-screen flex-col items-center gap-8 px-6 py-12">
       <Logo />
 
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-5xl">
         {info === undefined ? (
           <div className="flex h-64 items-center justify-center">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -145,14 +167,32 @@ export default function ListaConfirmadosPublicaPage() {
                   description="Assim que houver confirmações, elas aparecem aqui automaticamente."
                 />
               ) : (
-                <ul className="divide-y divide-border">
-                  {confirmados.map((c) => (
-                    <li key={c.funcionario_id} className="flex items-center justify-between gap-3 py-3">
-                      <span className="text-sm font-medium text-foreground">{c.nome}</span>
-                      <span className="text-xs text-muted-foreground">{c.funcao_nome}</span>
-                    </li>
-                  ))}
-                </ul>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome completo</TableHead>
+                      <TableHead>Função</TableHead>
+                      <TableHead>CPF</TableHead>
+                      <TableHead>Data de nascimento</TableHead>
+                      <TableHead>Telefone</TableHead>
+                      <TableHead>E-mail</TableHead>
+                      <TableHead>Chave PIX</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {confirmados.map((c) => (
+                      <TableRow key={c.funcionario_id}>
+                        <TableCell className="font-medium text-foreground">{c.nome}</TableCell>
+                        <TableCell className="text-muted-foreground">{c.funcao_nome}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatCPF(c.cpf) || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatDate(c.data_nascimento)}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatTelefone(c.telefone) || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">{c.email || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">{c.chave_pix || "—"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
 
               <p className="mt-4 text-xs text-muted-foreground">

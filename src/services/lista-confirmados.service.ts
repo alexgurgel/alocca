@@ -15,6 +15,11 @@ export interface FreelancerConfirmado {
   funcionario_id: string;
   nome: string;
   funcao_nome: string;
+  cpf: string | null;
+  data_nascimento: string | null;
+  telefone: string | null;
+  email: string | null;
+  chave_pix: string | null;
 }
 
 export async function getListaPublicaEventoInfo(
