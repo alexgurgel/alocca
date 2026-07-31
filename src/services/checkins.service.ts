@@ -44,6 +44,38 @@ export async function listCheckinsDoEvento(
   return (data ?? []) as unknown as CheckinComRelacoes[];
 }
 
+export interface FreelancerPendente {
+  id: string;
+  nome: string;
+}
+
+/**
+ * Lista os freelancers confirmados (convite aceito) cujo check-in ainda
+ * esta "pendente" — ou seja, sem presenca ou ausencia registrada. Usado
+ * para bloquear a finalizacao do evento. Garante primeiro que exista um
+ * check-in para cada confirmado (idempotente).
+ */
+export async function listConfirmadosSemCheckinResolvido(
+  supabase: SupabaseClient<Database>,
+  eventoId: string
+): Promise<FreelancerPendente[]> {
+  await garantirCheckinsDoEvento(supabase, eventoId);
+
+  const { data, error } = await supabase
+    .from("checkins")
+    .select("id, funcionario:funcionarios(id, nome)")
+    .eq("evento_id", eventoId)
+    .eq("status", "pendente");
+
+  if (error) throw error;
+
+  type Row = { id: string; funcionario: { id: string; nome: string } };
+  return ((data ?? []) as unknown as Row[]).map((row) => ({
+    id: row.funcionario.id,
+    nome: row.funcionario.nome,
+  }));
+}
+
 export async function atualizarStatusCheckin(
   supabase: SupabaseClient<Database>,
   id: string,
