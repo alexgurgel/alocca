@@ -55,6 +55,15 @@ export function formatDateTime(value: string | Date | null | undefined) {
   }).format(date);
 }
 
+export function slugify(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export function getInitials(nome: string | null | undefined) {
   if (!nome) return "?";
   const parts = nome.trim().split(/\s+/);

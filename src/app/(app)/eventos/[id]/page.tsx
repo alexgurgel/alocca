@@ -24,10 +24,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventoStatusBadge } from "@/components/eventos/evento-status-badge";
 import { PainelControle } from "@/components/eventos/painel-controle";
 import { InscricaoPublicaCard } from "@/components/eventos/inscricao-publica-card";
+import { ListaPublicaCard } from "@/components/eventos/lista-publica-card";
+import { FinalizarEventoCard } from "@/components/eventos/finalizar-evento-card";
+import { RelatorioFinanceiroTab } from "@/components/eventos/relatorio-financeiro-tab";
 import { EscalaTab } from "@/components/escalas/escala-tab";
 import { CheckinList } from "@/components/checkin/checkin-list";
 import { createClient } from "@/lib/supabase/client";
-import { deleteEvento, getEvento } from "@/services/eventos.service";
+import { avancarStatusEvento, deleteEvento, getEvento } from "@/services/eventos.service";
 import { formatDateTime } from "@/lib/format";
 import type { Evento } from "@/types";
 
@@ -39,6 +42,7 @@ export default function EventoDetailPage() {
 
   const [evento, setEvento] = useState<Evento | null | undefined>(undefined);
   const [confirmarExcluir, setConfirmarExcluir] = useState(false);
+  const [tab, setTab] = useState(searchParams.get("tab") ?? "visao-geral");
   const { painel, carregando: carregandoPainel } = usePainelEvento(evento?.id);
 
   useEffect(() => {
@@ -51,6 +55,17 @@ export default function EventoDetailPage() {
       ativo = false;
     };
   }, [params.id]);
+
+  useEffect(() => {
+    if (!evento || evento.status !== "planejado") return;
+    if (new Date(evento.data_inicio) > new Date()) return;
+    const supabase = createClient();
+    avancarStatusEvento(supabase, evento.id).then((atualizado) => {
+      if (atualizado) setEvento(atualizado);
+    });
+  }, [evento]);
+
+  const eventoVencido = !!evento && evento.status === "em_andamento" && new Date(evento.data_fim) <= new Date();
 
   async function handleExcluir() {
     if (!evento) return;
@@ -151,15 +166,24 @@ export default function EventoDetailPage() {
         ) : null}
       </div>
 
-      <Tabs defaultValue={searchParams.get("tab") ?? "visao-geral"}>
+      <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
         <TabsList>
           <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
           <TabsTrigger value="escala">Escala</TabsTrigger>
           <TabsTrigger value="checkin">Check-in</TabsTrigger>
+          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
         </TabsList>
 
         <TabsContent value="visao-geral" className="space-y-4 pt-4">
+          {eventoVencido ? (
+            <FinalizarEventoCard
+              evento={evento}
+              onAtualizado={setEvento}
+              onIrParaCheckin={() => setTab("checkin")}
+            />
+          ) : null}
           <InscricaoPublicaCard evento={evento} onAtualizado={setEvento} />
+          <ListaPublicaCard evento={evento} onAtualizado={setEvento} />
           <PainelControle painel={painel} carregando={carregandoPainel} />
         </TabsContent>
 
@@ -169,6 +193,10 @@ export default function EventoDetailPage() {
 
         <TabsContent value="checkin" className="pt-4">
           <CheckinList eventoId={evento.id} />
+        </TabsContent>
+
+        <TabsContent value="financeiro" className="pt-4">
+          <RelatorioFinanceiroTab evento={evento} />
         </TabsContent>
       </Tabs>
 

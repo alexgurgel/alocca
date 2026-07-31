@@ -131,6 +131,49 @@ export async function toggleInscricaoPublica(
   return data;
 }
 
+export async function toggleListaPublica(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  ativa: boolean
+) {
+  const { data, error } = await supabase
+    .from("eventos")
+    .update({ lista_publica_ativa: ativa })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Avanca planejado -> em_andamento sob demanda quando o evento e carregado
+ * no app (a varredura em lote via pg_cron cobre o caso de ninguem estar
+ * com o app aberto no horario exato). Retorna null se nao havia nada a
+ * avancar (evita um setState desnecessario no chamador).
+ */
+export async function avancarStatusEvento(
+  supabase: SupabaseClient<Database>,
+  id: string
+): Promise<Evento | null> {
+  const { data, error } = await supabase.rpc("avancar_status_evento", { p_evento_id: id });
+  if (error) throw error;
+  return data ?? null;
+}
+
+export async function finalizarEvento(supabase: SupabaseClient<Database>, id: string) {
+  const { data, error } = await supabase
+    .from("eventos")
+    .update({ status: "finalizado" })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteEvento(supabase: SupabaseClient<Database>, id: string) {
   const { error } = await supabase.from("eventos").delete().eq("id", id);
   if (error) throw error;

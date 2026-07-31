@@ -21,6 +21,7 @@ import { eventoSchema, novoEventoSchema, type EventoInput } from "@/lib/validati
 import type { Evento } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { createEvento, updateEvento } from "@/services/eventos.service";
+import { DataHoraField, parseDataDoValor } from "@/components/eventos/data-hora-field";
 
 function toDatetimeLocal(iso: string) {
   const date = new Date(iso);
@@ -34,10 +35,6 @@ function defaultDatetimeLocal(horasOffset: number) {
   const date = new Date();
   date.setHours(date.getHours() + horasOffset, 0, 0, 0);
   return toDatetimeLocal(date.toISOString());
-}
-
-function nowDatetimeLocal() {
-  return toDatetimeLocal(new Date().toISOString());
 }
 
 interface EventoFormProps {
@@ -119,22 +116,34 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
 
           <Field data-invalid={!!errors.data_inicio}>
             <FieldLabel htmlFor="data_inicio">Início</FieldLabel>
-            <Input
-              id="data_inicio"
-              type="datetime-local"
-              min={evento ? undefined : nowDatetimeLocal()}
-              {...register("data_inicio")}
+            <Controller
+              control={control}
+              name="data_inicio"
+              render={({ field }) => (
+                <DataHoraField
+                  id="data_inicio"
+                  value={field.value}
+                  onChange={field.onChange}
+                  minDate={evento ? undefined : new Date()}
+                />
+              )}
             />
             <FieldError errors={[errors.data_inicio]} />
           </Field>
 
           <Field data-invalid={!!errors.data_fim}>
             <FieldLabel htmlFor="data_fim">Fim</FieldLabel>
-            <Input
-              id="data_fim"
-              type="datetime-local"
-              min={dataInicioValue || undefined}
-              {...register("data_fim")}
+            <Controller
+              control={control}
+              name="data_fim"
+              render={({ field }) => (
+                <DataHoraField
+                  id="data_fim"
+                  value={field.value}
+                  onChange={field.onChange}
+                  minDate={parseDataDoValor(dataInicioValue)}
+                />
+              )}
             />
             <FieldError errors={[errors.data_fim]} />
           </Field>
@@ -149,7 +158,7 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
                   items={{
                     planejado: "Planejado",
                     em_andamento: "Em andamento",
-                    finalizado: "Finalizado",
+                    ...(evento?.status === "finalizado" ? { finalizado: "Finalizado" } : {}),
                     cancelado: "Cancelado",
                   }}
                   value={field.value}
@@ -161,12 +170,19 @@ export function EventoForm({ empresaId, criadoPor, evento }: EventoFormProps) {
                   <SelectContent>
                     <SelectItem value="planejado">Planejado</SelectItem>
                     <SelectItem value="em_andamento">Em andamento</SelectItem>
-                    <SelectItem value="finalizado">Finalizado</SelectItem>
+                    {evento?.status === "finalizado" ? (
+                      <SelectItem value="finalizado">Finalizado</SelectItem>
+                    ) : null}
                     <SelectItem value="cancelado">Cancelado</SelectItem>
                   </SelectContent>
                 </Select>
               )}
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Passa para &quot;Em andamento&quot; sozinho no horário de início. Para finalizar, use o
+              botão &quot;Finalizar evento&quot; na visão geral — ele confere a presença de todos os
+              freelancers confirmados antes de liberar.
+            </p>
           </Field>
 
           <Field className="sm:col-span-2">

@@ -170,6 +170,7 @@ export interface Database {
           observacoes: string | null;
           status: StatusEvento;
           inscricao_publica_ativa: boolean;
+          lista_publica_ativa: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -186,6 +187,7 @@ export interface Database {
           observacoes?: string | null;
           status?: StatusEvento;
           inscricao_publica_ativa?: boolean;
+          lista_publica_ativa?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -362,6 +364,30 @@ export interface Database {
           p_aceite_lgpd: boolean;
         };
         Returns: string;
+      };
+      avancar_status_evento: {
+        Args: { p_evento_id: string };
+        Returns: Database["public"]["Tables"]["eventos"]["Row"];
+      };
+      lista_publica_evento_info: {
+        Args: { p_evento_id: string };
+        Returns: {
+          id: string;
+          nome: string;
+          local: string | null;
+          data_inicio: string;
+          data_fim: string;
+          status: string;
+          empresa_nome: string;
+        }[];
+      };
+      lista_confirmados_evento: {
+        Args: { p_evento_id: string };
+        Returns: {
+          funcionario_id: string;
+          nome: string;
+          funcao_nome: string;
+        }[];
       };
     };
     Enums: Record<string, never>;
