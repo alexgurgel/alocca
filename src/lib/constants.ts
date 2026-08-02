@@ -1,4 +1,10 @@
-import type { StatusCheckin, StatusConvite, StatusEvento, StatusFuncionario } from "@/types";
+import type {
+  StatusCandidatura,
+  StatusCheckin,
+  StatusConvite,
+  StatusEvento,
+  StatusFuncionario,
+} from "@/types";
 
 export const APP_NAME = "Alocca";
 
@@ -20,6 +26,12 @@ export const STATUS_CONVITE_TONE: Record<StatusConvite, BadgeTone> = {
   pendente: "amber",
   aceito: "green",
   recusado: "red",
+};
+
+export const STATUS_CANDIDATURA_TONE: Record<StatusCandidatura, BadgeTone> = {
+  pendente: "amber",
+  aprovada: "green",
+  rejeitada: "red",
 };
 
 export const STATUS_CHECKIN_TONE: Record<StatusCheckin, BadgeTone> = {

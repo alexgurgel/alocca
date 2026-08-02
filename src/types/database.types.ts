@@ -7,6 +7,7 @@
 export type StatusFuncionario = "ativo" | "inativo";
 export type StatusEvento = "planejado" | "em_andamento" | "finalizado" | "cancelado";
 export type StatusConvite = "pendente" | "aceito" | "recusado";
+export type StatusCandidatura = "pendente" | "aprovada" | "rejeitada";
 export type StatusCheckin = "pendente" | "presente" | "ausente" | "atrasado";
 export type PapelUsuario = "admin" | "colaborador";
 
@@ -162,6 +163,10 @@ export interface Database {
           data_fim: string;
           valor_diaria_padrao: number | null;
           observacoes: string | null;
+          lista_publica_token: string;
+          candidatura_publica_token: string;
+          lista_publica_observacao_fornecedor: string | null;
+          lista_publica_observacao_fornecedor_at: string | null;
           status: StatusEvento;
           created_at: string;
           updated_at: string;
@@ -178,6 +183,10 @@ export interface Database {
           data_fim: string;
           valor_diaria_padrao?: number | null;
           observacoes?: string | null;
+          lista_publica_token?: string;
+          candidatura_publica_token?: string;
+          lista_publica_observacao_fornecedor?: string | null;
+          lista_publica_observacao_fornecedor_at?: string | null;
           status?: StatusEvento;
           created_at?: string;
           updated_at?: string;
@@ -229,6 +238,64 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["convites"]["Insert"]>;
+        Relationships: Relationship[];
+      };
+      candidaturas_evento: {
+        Row: {
+          id: string;
+          empresa_id: string;
+          evento_id: string;
+          funcao_id: string;
+          funcionario_id: string | null;
+          convite_id: string | null;
+          nome: string;
+          cpf: string | null;
+          telefone: string | null;
+          email: string | null;
+          observacoes: string | null;
+          data_nascimento: string | null;
+          cidade: string | null;
+          estado: string | null;
+          lgpd_aceito: boolean;
+          lgpd_aceito_em: string | null;
+          email_confirmacao_enviado_em: string | null;
+          email_confirmacao_destino: string | null;
+          email_confirmacao_erro: string | null;
+          status: StatusCandidatura;
+          aprovada_em: string | null;
+          rejeitada_em: string | null;
+          avaliada_em: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          empresa_id: string;
+          evento_id: string;
+          funcao_id: string;
+          funcionario_id?: string | null;
+          convite_id?: string | null;
+          nome: string;
+          cpf?: string | null;
+          telefone?: string | null;
+          email?: string | null;
+          observacoes?: string | null;
+          data_nascimento?: string | null;
+          cidade?: string | null;
+          estado?: string | null;
+          lgpd_aceito?: boolean;
+          lgpd_aceito_em?: string | null;
+          email_confirmacao_enviado_em?: string | null;
+          email_confirmacao_destino?: string | null;
+          email_confirmacao_erro?: string | null;
+          status?: StatusCandidatura;
+          aprovada_em?: string | null;
+          rejeitada_em?: string | null;
+          avaliada_em?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["candidaturas_evento"]["Insert"]>;
         Relationships: Relationship[];
       };
       checkins: {
@@ -291,6 +358,101 @@ export interface Database {
           evento_data_fim: string;
           evento_observacoes: string | null;
         }[];
+      };
+      obter_lista_publica_evento: {
+        Args: { p_token: string };
+        Returns: {
+          evento_id: string;
+          evento_nome: string;
+          evento_status: StatusEvento;
+          evento_cliente: string | null;
+          evento_local: string | null;
+          evento_endereco: string | null;
+          evento_data_inicio: string;
+          evento_data_fim: string;
+          evento_observacoes: string | null;
+          lista_publica_token: string;
+          lista_publica_observacao_fornecedor: string | null;
+          lista_publica_observacao_fornecedor_at: string | null;
+          funcao_id: string | null;
+          funcao_nome: string | null;
+          vagas: number | null;
+          convite_id: string | null;
+          convite_status: StatusConvite | null;
+          funcionario_nome: string | null;
+          valor_diaria: number | null;
+          convite_observacoes: string | null;
+          respondido_em: string | null;
+        }[];
+      };
+      obter_evento_candidatura_publica: {
+        Args: { p_token: string };
+        Returns: {
+          evento_id: string;
+          evento_nome: string;
+          evento_status: StatusEvento;
+          evento_cliente: string | null;
+          evento_local: string | null;
+          evento_endereco: string | null;
+          evento_data_inicio: string;
+          evento_data_fim: string;
+          evento_observacoes: string | null;
+          candidatura_publica_token: string;
+          funcao_id: string;
+          funcao_nome: string;
+          vagas: number;
+          confirmados: number;
+          pendentes: number;
+        }[];
+      };
+      atualizar_observacao_publica_evento: {
+        Args: { p_token: string; p_observacao: string | null };
+        Returns: undefined;
+      };
+      criar_candidatura_publica: {
+        Args: {
+          p_token: string;
+          p_funcao_id: string;
+          p_nome: string;
+          p_cpf: string;
+          p_telefone: string;
+          p_email: string;
+          p_data_nascimento: string;
+          p_cidade: string;
+          p_estado: string;
+          p_lgpd_aceito: boolean;
+          p_observacoes?: string | null;
+        };
+        Returns: string;
+      };
+      buscar_cadastro_publico_evento: {
+        Args: {
+          p_token: string;
+          p_cpf: string;
+          p_email?: string | null;
+          p_telefone?: string | null;
+        };
+        Returns: {
+          funcionario_id: string | null;
+          nome: string | null;
+          cpf: string | null;
+          telefone: string | null;
+          email: string | null;
+          data_nascimento: string | null;
+          cidade: string | null;
+          estado: string | null;
+          observacoes: string | null;
+          ja_cadastrado_evento: boolean;
+          candidatura_status: StatusCandidatura | null;
+        }[];
+      };
+      aprovar_candidatura_evento: {
+        Args: { p_candidatura_id: string };
+        Returns: string;
+      };
+      rejeitar_candidatura_evento: {
+        Args: { p_candidatura_id: string };
+        Returns: undefined;
       };
       responder_convite_publico: {
         Args: { p_id: string; p_status: string };

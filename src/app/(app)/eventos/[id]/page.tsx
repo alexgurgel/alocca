@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventoStatusBadge } from "@/components/eventos/evento-status-badge";
 import { PainelControle } from "@/components/eventos/painel-controle";
 import { EscalaTab } from "@/components/escalas/escala-tab";
+import { CandidaturasTab } from "@/components/candidaturas/candidaturas-tab";
 import { CheckinList } from "@/components/checkin/checkin-list";
 import { createClient } from "@/lib/supabase/client";
 import { deleteEvento, getEvento } from "@/services/eventos.service";
@@ -161,6 +162,7 @@ export default function EventoDetailPage() {
         <TabsList>
           <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
           <TabsTrigger value="escala">Escala</TabsTrigger>
+          <TabsTrigger value="candidaturas">Candidaturas</TabsTrigger>
           <TabsTrigger value="checkin">Check-in</TabsTrigger>
         </TabsList>
 
@@ -170,6 +172,10 @@ export default function EventoDetailPage() {
 
         <TabsContent value="escala" className="pt-4">
           <EscalaTab empresaId={perfil.empresa_id ?? ""} evento={evento} />
+        </TabsContent>
+
+        <TabsContent value="candidaturas" className="pt-4">
+          <CandidaturasTab evento={evento} />
         </TabsContent>
 
         <TabsContent value="checkin" className="pt-4">

@@ -1,5 +1,6 @@
 import type {
   Database,
+  StatusCandidatura,
   StatusCheckin,
   StatusConvite,
   StatusEvento,
@@ -8,6 +9,7 @@ import type {
 
 export type {
   StatusCheckin,
+  StatusCandidatura,
   StatusConvite,
   StatusEvento,
   StatusFuncionario,
@@ -21,6 +23,7 @@ export type Funcao = Database["public"]["Tables"]["funcoes"]["Row"];
 export type Evento = Database["public"]["Tables"]["eventos"]["Row"];
 export type EventoFuncao = Database["public"]["Tables"]["evento_funcoes"]["Row"];
 export type Convite = Database["public"]["Tables"]["convites"]["Row"];
+export type CandidaturaEvento = Database["public"]["Tables"]["candidaturas_evento"]["Row"];
 export type Checkin = Database["public"]["Tables"]["checkins"]["Row"];
 
 export interface FuncionarioComFuncoes extends Funcionario {
@@ -42,6 +45,12 @@ export interface CheckinComRelacoes extends Checkin {
   funcionario: Funcionario;
 }
 
+export interface CandidaturaEventoComRelacoes extends CandidaturaEvento {
+  funcao: Funcao;
+  funcionario?: Funcionario | null;
+  convite?: Convite | null;
+}
+
 export const STATUS_FUNCIONARIO_LABEL: Record<StatusFuncionario, string> = {
   ativo: "Ativo",
   inativo: "Inativo",
@@ -58,6 +67,12 @@ export const STATUS_CONVITE_LABEL: Record<StatusConvite, string> = {
   pendente: "Pendente",
   aceito: "Aceito",
   recusado: "Recusado",
+};
+
+export const STATUS_CANDIDATURA_LABEL: Record<StatusCandidatura, string> = {
+  pendente: "Pendente",
+  aprovada: "Aprovada",
+  rejeitada: "Rejeitada",
 };
 
 export const STATUS_CHECKIN_LABEL: Record<StatusCheckin, string> = {

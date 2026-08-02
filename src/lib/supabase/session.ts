@@ -14,6 +14,8 @@ function isPublicRoute(pathname: string) {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
   if (pathname.startsWith("/auth/")) return true;
   if (pathname.startsWith("/convite/")) return true;
+  if (pathname.startsWith("/lista/")) return true;
+  if (pathname.startsWith("/candidatura/")) return true;
   return false;
 }
 

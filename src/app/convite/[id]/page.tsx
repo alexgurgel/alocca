@@ -61,6 +61,13 @@ export default function ConvitePublicoPage() {
           <EmptyState icon={MailX} title="Convite não encontrado ou inválido" />
         ) : (
           <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-primary">Confirmacao de presenca</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Sua aprovacao foi concluida. Agora confirme se voce podera participar.
+              </p>
+            </div>
+
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold tracking-tight text-foreground">
@@ -136,7 +143,7 @@ export default function ConvitePublicoPage() {
               <div className="flex gap-3">
                 <Button className="flex-1" disabled={enviando} onClick={() => responder("aceito")}>
                   {enviando ? <Loader2 className="size-4 animate-spin" /> : <Check />}
-                  Aceitar
+                  Confirmar presenca
                 </Button>
                 <Button
                   variant="outline"
