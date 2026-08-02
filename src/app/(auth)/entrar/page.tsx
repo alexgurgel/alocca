@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -16,7 +16,6 @@ import { createClient } from "@/lib/supabase/client";
 import { entrar } from "@/services/auth.service";
 
 function EntrarForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
@@ -39,9 +38,12 @@ function EntrarForm() {
     try {
       const supabase = createClient();
       await entrar(supabase, values.email, values.senha);
+      // Navegação forte (não router.push): garante que o middleware e os
+      // Server Components leiam a sessão recém-criada a partir de uma
+      // requisição nova, evitando ficar preso num estado de navegação
+      // em cache anterior ao login.
       const redirect = searchParams.get("redirect") || "/painel";
-      router.push(redirect);
-      router.refresh();
+      window.location.assign(redirect);
     } catch {
       toast.error("E-mail ou senha inválidos.");
     }

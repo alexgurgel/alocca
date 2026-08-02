@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -18,7 +17,6 @@ import { createClient } from "@/lib/supabase/client";
 import { criarContaInicial } from "@/services/empresas.service";
 
 export default function CadastroPage() {
-  const router = useRouter();
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [emailEnviado, setEmailEnviado] = useState(false);
 
@@ -53,8 +51,7 @@ export default function CadastroPage() {
           email: values.email,
           aceiteLgpd: values.aceiteLgpd,
         });
-        router.push("/painel");
-        router.refresh();
+        window.location.assign("/painel");
         return;
       }
 
