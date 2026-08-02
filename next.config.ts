@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    useWasmBinary: true,
+  },
 };
 
 export default nextConfig;

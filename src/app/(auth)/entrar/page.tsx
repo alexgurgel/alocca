@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -13,10 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth.schema";
 import { createClient } from "@/lib/supabase/client";
-import { entrar } from "@/services/auth.service";
 
 function EntrarForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
@@ -29,21 +27,31 @@ function EntrarForm() {
   useEffect(() => {
     const erro = searchParams.get("erro");
     if (erro === "perfil") {
-      toast.error("Não foi possível concluir seu cadastro. Tente se cadastrar novamente.");
+      toast.error("Nao foi possivel concluir seu cadastro. Tente se cadastrar novamente.");
     } else if (erro === "auth") {
-      toast.error("Não foi possível confirmar seu e-mail. Tente novamente.");
+      toast.error("Nao foi possivel confirmar seu e-mail. Tente novamente.");
     }
   }, [searchParams]);
 
   async function onSubmit(values: LoginInput) {
     try {
       const supabase = createClient();
-      await entrar(supabase, values.email, values.senha);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.senha,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      await supabase.auth.getSession();
+
       const redirect = searchParams.get("redirect") || "/painel";
-      router.push(redirect);
-      router.refresh();
-    } catch {
-      toast.error("E-mail ou senha inválidos.");
+      window.location.assign(redirect);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "E-mail ou senha invalidos.";
+      toast.error(message);
     }
   }
 
@@ -51,9 +59,7 @@ function EntrarForm() {
     <div className="space-y-8">
       <div className="space-y-1.5">
         <h2 className="text-2xl font-semibold tracking-tight">Conecte-se</h2>
-        <p className="text-sm text-muted-foreground">
-          Acesse o painel de gestão da sua operação.
-        </p>
+        <p className="text-sm text-muted-foreground">Acesse o painel de gestao da sua operacao.</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -84,7 +90,7 @@ function EntrarForm() {
               id="senha"
               type={mostrarSenha ? "text" : "password"}
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder="********"
               className="pr-9"
               {...register("senha")}
             />
@@ -107,7 +113,7 @@ function EntrarForm() {
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Ainda não tem uma conta?{" "}
+        Ainda nao tem uma conta?{" "}
         <Link href="/cadastro" className="font-medium text-primary hover:underline">
           Criar conta
         </Link>
