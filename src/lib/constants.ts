@@ -1,4 +1,4 @@
-import type { StatusCheckin, StatusConvite, StatusEvento, StatusFuncionario } from "@/types";
+import type { StatusCheckin, StatusConta, StatusConvite, StatusEvento, StatusFuncionario } from "@/types";
 
 export const APP_NAME = "Alocca";
 
@@ -27,6 +27,12 @@ export const STATUS_CHECKIN_TONE: Record<StatusCheckin, BadgeTone> = {
   presente: "green",
   ausente: "red",
   atrasado: "amber",
+};
+
+export const STATUS_CONTA_TONE: Record<StatusConta, BadgeTone> = {
+  pendente: "amber",
+  aprovado: "green",
+  recusado: "red",
 };
 
 export const TONE_BG_SOLID: Record<BadgeTone, string> = {
@@ -60,4 +66,5 @@ export const NAV_ITEMS = [
   { label: "Check-in", href: "/checkin", icon: "QrCode" },
   { label: "Relatórios", href: "/relatorios", icon: "BarChart3" },
   { label: "Configurações", href: "/configuracoes", icon: "Settings" },
+  { label: "Aprovações", href: "/aprovacoes", icon: "ShieldCheck", adminPlataformaOnly: true },
 ] as const;

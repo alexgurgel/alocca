@@ -13,7 +13,7 @@ export function Sidebar({ perfil }: { perfil: Perfil }) {
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-2">
-        <SidebarNav />
+        <SidebarNav perfil={perfil} />
       </div>
       <div className="border-t border-white/10 p-3">
         <UserMenu perfil={perfil} dark />

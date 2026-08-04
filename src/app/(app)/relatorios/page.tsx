@@ -1,18 +1,37 @@
 "use client";
 
-import { CalendarCheck2, TrendingUp, UserCheck2, Users } from "lucide-react";
+import { CalendarCheck2, Lock, TrendingUp, UserCheck2, Users } from "lucide-react";
 import { useAppContext } from "@/components/providers/app-provider";
 import { useRelatorios } from "@/hooks/use-relatorios";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { EventosPorStatusList } from "@/components/relatorios/eventos-por-status-list";
 import { ColaboradoresAtivosList } from "@/components/relatorios/colaboradores-ativos-list";
+import { PLANOS_COM_RELATORIOS } from "@/types";
 
 export default function RelatoriosPage() {
   const { perfil } = useAppContext();
+  const temAcesso = PLANOS_COM_RELATORIOS.includes(perfil.plano);
   const { resumo, eventosPorStatus, colaboradoresAtivos, carregando } = useRelatorios(
-    perfil.empresa_id ?? undefined
+    temAcesso ? (perfil.empresa_id ?? undefined) : undefined
   );
+
+  if (!temAcesso) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Relatórios"
+          description="Indicadores gerais da operação da sua produtora."
+        />
+        <EmptyState
+          icon={Lock}
+          title="Disponível a partir do plano Intermediário"
+          description="Seu plano atual (Free) não inclui relatórios. Fale com o administrador da Alocca para fazer upgrade."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

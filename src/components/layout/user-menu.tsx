@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { LogOut, Settings, User } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,14 +28,14 @@ export function UserMenu({
   dark?: boolean;
   minimal?: boolean;
 }) {
-  const router = useRouter();
-
   async function handleSair() {
     try {
       const supabase = createClient();
       await sair(supabase);
-      router.push("/entrar");
-      router.refresh();
+      // Navegação forte: garante que o middleware pare de ver a sessão
+      // encerrada a partir de uma requisição nova, em vez de um estado
+      // de navegação em cache (mesmo fix aplicado ao login).
+      window.location.assign("/entrar");
     } catch {
       toast.error("Não foi possível sair. Tente novamente.");
     }

@@ -10,6 +10,8 @@ export type StatusConvite = "pendente" | "aceito" | "recusado";
 export type OrigemConvite = "convite" | "candidatura";
 export type StatusCheckin = "pendente" | "presente" | "ausente" | "atrasado";
 export type PapelUsuario = "admin" | "colaborador";
+export type PlanoAcesso = "free" | "intermediario" | "master" | "admin";
+export type StatusConta = "pendente" | "aprovado" | "recusado";
 
 type Relationship = {
   foreignKeyName: string;
@@ -61,6 +63,10 @@ export interface Database {
           telefone: string | null;
           papel: PapelUsuario;
           consentimento_lgpd_em: string | null;
+          plano: PlanoAcesso;
+          status_conta: StatusConta;
+          aprovado_por: string | null;
+          aprovado_em: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -74,6 +80,10 @@ export interface Database {
           telefone?: string | null;
           papel?: PapelUsuario;
           consentimento_lgpd_em?: string | null;
+          plano?: PlanoAcesso;
+          status_conta?: StatusConta;
+          aprovado_por?: string | null;
+          aprovado_em?: string | null;
           created_at?: string;
           updated_at?: string;
         };

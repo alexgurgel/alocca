@@ -30,6 +30,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/meus-convites");
   }
 
+  if (perfil.status_conta !== "aprovado") {
+    redirect("/aguardando-aprovacao");
+  }
+
   const { data: empresa } = perfil.empresa_id
     ? await supabase.from("empresas").select("*").eq("id", perfil.empresa_id).maybeSingle()
     : { data: null };

@@ -31,7 +31,7 @@ export function Topbar({ perfil }: { perfil: Perfil }) {
               <Logo variant="dark" />
             </div>
             <div className="flex-1 px-3 py-2">
-              <SidebarNav onNavigate={() => setOpen(false)} />
+              <SidebarNav perfil={perfil} onNavigate={() => setOpen(false)} />
             </div>
             <div className="absolute inset-x-0 bottom-0 border-t border-white/10 p-3">
               <UserMenu perfil={perfil} dark />

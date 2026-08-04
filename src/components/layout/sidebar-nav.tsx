@@ -5,13 +5,17 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/lib/constants";
 import { NAV_ICON_MAP } from "./nav-icons";
+import type { Perfil } from "@/types";
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({ onNavigate, perfil }: { onNavigate?: () => void; perfil?: Perfil }) {
   const pathname = usePathname();
+  const itens = NAV_ITEMS.filter(
+    (item) => !("adminPlataformaOnly" in item) || perfil?.plano === "admin"
+  );
 
   return (
     <nav className="flex flex-col gap-1">
-      {NAV_ITEMS.map((item) => {
+      {itens.map((item) => {
         const Icon = NAV_ICON_MAP[item.icon];
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 

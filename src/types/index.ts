@@ -1,6 +1,8 @@
 import type {
   Database,
+  PlanoAcesso,
   StatusCheckin,
+  StatusConta,
   StatusConvite,
   StatusEvento,
   StatusFuncionario,
@@ -13,6 +15,8 @@ export type {
   StatusEvento,
   StatusFuncionario,
   PapelUsuario,
+  PlanoAcesso,
+  StatusConta,
 } from "./database.types";
 
 export type Empresa = Database["public"]["Tables"]["empresas"]["Row"];
@@ -67,6 +71,21 @@ export const STATUS_CHECKIN_LABEL: Record<StatusCheckin, string> = {
   ausente: "Ausente",
   atrasado: "Atrasado",
 };
+
+export const PLANO_LABEL: Record<PlanoAcesso, string> = {
+  free: "Free",
+  intermediario: "Intermediário",
+  master: "Master",
+  admin: "Admin",
+};
+
+export const STATUS_CONTA_LABEL: Record<StatusConta, string> = {
+  pendente: "Pendente",
+  aprovado: "Aprovado",
+  recusado: "Recusado",
+};
+
+export const PLANOS_COM_RELATORIOS: PlanoAcesso[] = ["intermediario", "master", "admin"];
 
 export const ESTADOS_BR = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",

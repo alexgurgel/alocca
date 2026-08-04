@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
-import type { Perfil } from "@/types";
+import type { Empresa, Perfil, PlanoAcesso } from "@/types";
+
+export interface PerfilComEmpresa extends Perfil {
+  empresa: Empresa | null;
+}
 
 export async function getPerfilAtual(
   supabase: SupabaseClient<Database>
@@ -34,4 +38,52 @@ export async function atualizarPerfil(
 
   if (error) throw error;
   return data;
+}
+
+export async function listPerfisAdmins(
+  supabase: SupabaseClient<Database>
+): Promise<PerfilComEmpresa[]> {
+  const { data, error } = await supabase
+    .from("perfis")
+    .select("*, empresa:empresas(*)")
+    .eq("papel", "admin")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as unknown as PerfilComEmpresa[];
+}
+
+export async function aprovarPerfil(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  aprovadoPorId: string
+) {
+  const { error } = await supabase
+    .from("perfis")
+    .update({ status_conta: "aprovado", aprovado_por: aprovadoPorId, aprovado_em: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
+export async function recusarPerfil(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  aprovadoPorId: string
+) {
+  const { error } = await supabase
+    .from("perfis")
+    .update({ status_conta: "recusado", aprovado_por: aprovadoPorId, aprovado_em: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
+export async function atualizarPlanoPerfil(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  plano: PlanoAcesso
+) {
+  const { error } = await supabase.from("perfis").update({ plano }).eq("id", id);
+  if (error) throw error;
 }
