@@ -41,10 +41,14 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // getUser() (nao getSession()) e obrigatorio aqui: getSession() nao
+  // revalida o token no servidor e, pior, chamar getSession() em varios
+  // lugares (middleware + layout + pages) na mesma navegacao entra em
+  // corrida na rotacao do refresh token e derruba a sessao com
+  // "Invalid Refresh Token" — foi a causa real do loop de redirecionamento.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const user = session?.user ?? null;
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { pathname, search } = request.nextUrl;
   const publicRoute = isPublicRoute(pathname);
@@ -55,9 +59,12 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && (pathname === "/entrar" || pathname === "/cadastro")) {
-    return NextResponse.redirect(new URL("/painel", request.url));
-  }
+  // Nao redireciona automaticamente um usuario autenticado pra longe de
+  // /entrar ou /cadastro aqui: isso nao sabe se o perfil existe/foi
+  // aprovado, e um usuario autenticado sem perfil (ou pendente) ficaria
+  // preso num loop infinito com o redirect da layout. Quem decide pra
+  // onde mandar um usuario ja logado e a propria pagina/layout, que tem
+  // acesso ao estado real do perfil.
 
   return response;
 }

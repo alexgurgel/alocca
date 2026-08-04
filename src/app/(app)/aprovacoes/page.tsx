@@ -8,17 +8,17 @@ export default async function AprovacoesPage() {
   const supabase = await createClient();
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session?.user) {
+  if (!user) {
     redirect("/entrar");
   }
 
   const { data: perfil } = await supabase
     .from("perfis")
     .select("plano")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   if (perfil?.plano !== "admin") {
@@ -31,7 +31,7 @@ export default async function AprovacoesPage() {
         title="Aprovações"
         description="Aprove novos cadastros de produtoras e gerencie o plano de acesso de cada uma."
       />
-      <AprovacoesManager currentUserId={session.user.id} />
+      <AprovacoesManager currentUserId={user.id} />
     </div>
   );
 }

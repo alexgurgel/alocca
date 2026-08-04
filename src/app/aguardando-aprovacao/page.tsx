@@ -9,17 +9,17 @@ export default async function AguardandoAprovacaoPage() {
   const supabase = await createClient();
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session?.user) {
+  if (!user) {
     redirect("/entrar");
   }
 
   const { data: perfil } = await supabase
     .from("perfis")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   if (!perfil) {
