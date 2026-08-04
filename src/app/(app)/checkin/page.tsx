@@ -9,16 +9,13 @@ import { useEventos } from "@/hooks/use-eventos";
 import { PageHeader } from "@/components/shared/page-header";
 import { PaginationBar } from "@/components/shared/pagination-bar";
 import { EmptyState } from "@/components/shared/empty-state";
-import { PlanoBloqueado } from "@/components/shared/plano-bloqueado";
 import { EventosToolbar } from "@/components/eventos/eventos-toolbar";
 import { EventoStatusBadge } from "@/components/eventos/evento-status-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDateTime } from "@/lib/format";
-import { PLANOS_COM_CHECKIN } from "@/types";
 
 export default function CheckinLandingPage() {
   const { perfil } = useAppContext();
-  const temAcesso = PLANOS_COM_CHECKIN.includes(perfil.plano);
   const {
     dados,
     total,
@@ -30,16 +27,7 @@ export default function CheckinLandingPage() {
     pagina,
     setPagina,
     porPagina,
-  } = useEventos(temAcesso ? (perfil.empresa_id ?? undefined) : undefined);
-
-  if (!temAcesso) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Check-in" description="Selecione o evento para confirmar a presença da equipe." />
-        <PlanoBloqueado planoAtual={perfil.plano} planoNecessario="Intermediário" />
-      </div>
-    );
-  }
+  } = useEventos(perfil.empresa_id ?? undefined);
 
   return (
     <div className="space-y-6">

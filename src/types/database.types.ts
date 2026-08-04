@@ -389,6 +389,7 @@ export interface Database {
           data_fim: string;
           status: string;
           empresa_nome: string;
+          exportacao_liberada: boolean;
         }[];
       };
       lista_confirmados_evento: {

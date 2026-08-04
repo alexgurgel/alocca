@@ -85,11 +85,11 @@ export const STATUS_CONTA_LABEL: Record<StatusConta, string> = {
   recusado: "Recusado",
 };
 
-// Free: eventos, freelancers, escalas, configurações e o link público de
-// candidatura (o básico pra rodar a operação). Os gates abaixo definem o
-// resto, do mais barato pro mais completo:
-export const PLANOS_COM_CHECKIN: PlanoAcesso[] = ["intermediario", "master", "admin"];
-export const PLANOS_COM_LISTA_PUBLICA: PlanoAcesso[] = ["intermediario", "master", "admin"];
+// Free: eventos, freelancers, escalas, check-in, configurações, link público
+// de candidatura e a lista pública de confirmados (ativar/copiar link) — o
+// básico pra rodar a operação. Só a exportação em PDF/Excel da lista pública
+// (checada no banco, na RPC lista_publica_evento_info) e as duas telas
+// abaixo exigem plano pago:
 export const PLANOS_COM_FINANCEIRO: PlanoAcesso[] = ["master", "admin"];
 export const PLANOS_COM_RELATORIOS: PlanoAcesso[] = ["master", "admin"];
 

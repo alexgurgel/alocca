@@ -23,23 +23,14 @@ interface FinalizarEventoCardProps {
   evento: Evento;
   onAtualizado: (evento: Evento) => void;
   onIrParaCheckin: () => void;
-  exigirCheckin: boolean;
 }
 
-export function FinalizarEventoCard({
-  evento,
-  onAtualizado,
-  onIrParaCheckin,
-  exigirCheckin,
-}: FinalizarEventoCardProps) {
+export function FinalizarEventoCard({ evento, onAtualizado, onIrParaCheckin }: FinalizarEventoCardProps) {
   const [open, setOpen] = useState(true);
   const [finalizando, setFinalizando] = useState(false);
-  // Sem acesso a check-in (plano Free), nao da pra exigir presenca
-  // registrada pra liberar a finalizacao — senao o evento nunca poderia
-  // ser finalizado. Nesse caso o hook nem roda (eventoId undefined).
-  const { pendentes, carregando } = useFinalizacaoEvento(exigirCheckin ? evento.id : undefined);
+  const { pendentes, carregando } = useFinalizacaoEvento(evento.id);
 
-  const bloqueado = exigirCheckin && (carregando || pendentes.length > 0);
+  const bloqueado = carregando || pendentes.length > 0;
 
   async function handleFinalizar() {
     setFinalizando(true);

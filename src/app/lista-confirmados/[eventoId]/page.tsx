@@ -142,22 +142,24 @@ export default function ListaConfirmadosPublicaPage() {
                   Freelancers confirmados ({confirmados.length})
                 </h3>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger render={<Button type="button" variant="outline" size="sm" />}>
-                    <Download />
-                    Baixar snapshot
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={exportarSnapshotPdf}>
-                      <FileText />
-                      PDF
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={exportarSnapshotExcel}>
-                      <FileSpreadsheet />
-                      Excel
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {info.exportacao_liberada ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger render={<Button type="button" variant="outline" size="sm" />}>
+                      <Download />
+                      Baixar snapshot
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={exportarSnapshotPdf}>
+                        <FileText />
+                        PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={exportarSnapshotExcel}>
+                        <FileSpreadsheet />
+                        Excel
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : null}
               </div>
 
               {confirmados.length === 0 ? (

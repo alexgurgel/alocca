@@ -9,6 +9,7 @@ export interface ListaPublicaEventoInfo {
   data_fim: string;
   status: string;
   empresa_nome: string;
+  exportacao_liberada: boolean;
 }
 
 export interface FreelancerConfirmado {
