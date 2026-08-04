@@ -85,7 +85,13 @@ export const STATUS_CONTA_LABEL: Record<StatusConta, string> = {
   recusado: "Recusado",
 };
 
-export const PLANOS_COM_RELATORIOS: PlanoAcesso[] = ["intermediario", "master", "admin"];
+// Free: eventos, freelancers, escalas, configurações e o link público de
+// candidatura (o básico pra rodar a operação). Os gates abaixo definem o
+// resto, do mais barato pro mais completo:
+export const PLANOS_COM_CHECKIN: PlanoAcesso[] = ["intermediario", "master", "admin"];
+export const PLANOS_COM_LISTA_PUBLICA: PlanoAcesso[] = ["intermediario", "master", "admin"];
+export const PLANOS_COM_FINANCEIRO: PlanoAcesso[] = ["master", "admin"];
+export const PLANOS_COM_RELATORIOS: PlanoAcesso[] = ["master", "admin"];
 
 export const ESTADOS_BR = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
