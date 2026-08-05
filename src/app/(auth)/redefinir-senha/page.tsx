@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +18,12 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { atualizarSenha } from "@/services/auth.service";
 
-export default function RedefinirSenhaPage() {
-  const router = useRouter();
+type EstadoSessao = "verificando" | "pronta" | "invalida";
+
+function RedefinirSenhaForm() {
+  const searchParams = useSearchParams();
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [estadoSessao, setEstadoSessao] = useState<EstadoSessao>("verificando");
 
   const {
     register,
@@ -27,16 +31,67 @@ export default function RedefinirSenhaPage() {
     formState: { errors, isSubmitting },
   } = useForm<RedefinirSenhaInput>({ resolver: zodResolver(redefinirSenhaSchema) });
 
+  useEffect(() => {
+    async function prepararSessaoDeRecuperacao() {
+      const supabase = createClient();
+      const code = searchParams.get("code");
+
+      // O link do e-mail chega com ?code=... (fluxo PKCE, igual a confirmacao
+      // de cadastro) — sem trocar esse codigo por uma sessao, updateUser()
+      // falha porque nao ha ninguem "logado" pra ter a senha trocada. Essa
+      // troca nunca estava acontecendo aqui, por isso a pagina sempre dava erro.
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        setEstadoSessao(error ? "invalida" : "pronta");
+        return;
+      }
+
+      // Sem "code" na URL: pode ser o fluxo antigo por hash (#access_token=...),
+      // que o supabase-js ja processa sozinho ao carregar a pagina. So
+      // confirma se, de fato, existe uma sessao ativa.
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setEstadoSessao(user ? "pronta" : "invalida");
+    }
+
+    prepararSessaoDeRecuperacao();
+  }, [searchParams]);
+
   async function onSubmit(values: RedefinirSenhaInput) {
     try {
       const supabase = createClient();
       await atualizarSenha(supabase, values.senha);
       toast.success("Senha redefinida com sucesso.");
-      router.push("/painel");
-      router.refresh();
+      window.location.assign("/painel");
     } catch {
       toast.error("Não foi possível redefinir sua senha. Solicite um novo link.");
     }
+  }
+
+  if (estadoSessao === "verificando") {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (estadoSessao === "invalida") {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-destructive/10">
+          <ShieldAlert className="size-6 text-destructive" />
+        </div>
+        <h2 className="text-xl font-semibold tracking-tight">Link inválido ou expirado</h2>
+        <p className="text-sm text-muted-foreground">
+          Esse link de redefinição de senha não é mais válido. Solicite um novo.
+        </p>
+        <Button variant="outline" render={<Link href="/esqueci-senha" />} className="w-full">
+          Pedir novo link
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -90,5 +145,13 @@ export default function RedefinirSenhaPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+export default function RedefinirSenhaPage() {
+  return (
+    <Suspense>
+      <RedefinirSenhaForm />
+    </Suspense>
   );
 }
