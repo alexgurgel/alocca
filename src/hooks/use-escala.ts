@@ -142,6 +142,21 @@ export function useEscala(eventoId: string | undefined) {
       const supabase = createClient();
       await avaliarCandidaturaService(supabase, conviteId, status, valorDiariaFuncao);
       toast.success(status === "aceito" ? "Candidatura aprovada." : "Candidatura recusada.");
+
+      if (status === "aceito") {
+        fetch("/api/notificar-confirmacao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conviteId }),
+        })
+          .then(async (res) => {
+            if (!res.ok) throw new Error(await res.text());
+          })
+          .catch(() => {
+            toast.error("Candidatura aprovada, mas não foi possível enviar o e-mail de confirmação.");
+          });
+      }
+
       await recarregar();
     },
     [recarregar]

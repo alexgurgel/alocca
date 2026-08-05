@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isCpfValido } from "@/lib/cpf";
 import { nomeCompletoSchema } from "./nome";
+import { maiorDeIdade } from "./idade";
 
 export const cpfLookupSchema = z.object({
   cpf: z.string().refine(isCpfValido, "CPF inválido"),
@@ -15,7 +16,10 @@ export const inscricaoPublicaSchema = z.object({
     .string()
     .refine((v) => v.replace(/\D/g, "").length >= 10, "Telefone inválido"),
   email: z.string().email("E-mail inválido"),
-  data_nascimento: z.string().min(1, "Informe a data de nascimento"),
+  data_nascimento: z
+    .string()
+    .min(1, "Informe a data de nascimento")
+    .refine(maiorDeIdade, "Não é permitido cadastro de menor de idade"),
   cidade: z.string().min(1, "Informe a cidade"),
   estado: z.string().min(2, "Selecione o estado"),
   chave_pix: z.string().min(1, "Informe sua chave PIX"),

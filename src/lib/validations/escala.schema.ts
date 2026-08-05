@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const escalaFuncaoSchema = z.object({
   funcao_id: z.string().min(1, "Selecione uma função"),
-  vagas: z.number().int().min(1, "Informe ao menos 1 vaga"),
+  vagas: z
+    .number({ error: "Informe a quantidade de vagas" })
+    .int({ error: "Informe a quantidade de vagas" })
+    .min(1, "Informe ao menos 1 vaga"),
   valor_diaria: z
     .string()
     .min(1, "Informe o valor da diária")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format, parse, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -38,17 +38,36 @@ interface DataHoraFieldProps {
 
 export function DataHoraField({ id, value, onChange, minDate, disabled }: DataHoraFieldProps) {
   const [open, setOpen] = useState(false);
-  const { data, hora } = parseValue(value);
+  const { data, hora: horaDoValor } = parseValue(value);
+
+  // Estado local do texto digitado: o valor "oficial" (via onChange) só é
+  // atualizado quando a hora estiver completa (HH:mm). Sem isso, cada tecla
+  // digitada era validada de imediato por montarValor, que descartava
+  // qualquer hora incompleta e voltava para "00:00" — impossível de editar.
+  const [horaDigitada, setHoraDigitada] = useState(horaDoValor);
+
+  useEffect(() => {
+    setHoraDigitada(horaDoValor);
+  }, [horaDoValor]);
 
   function handleSelecionarData(novaData: Date | undefined) {
-    onChange(montarValor(novaData, hora || "00:00"));
+    onChange(montarValor(novaData, horaDigitada || "00:00"));
     setOpen(false);
   }
 
   function handleHoraChange(input: string) {
     const digits = input.replace(/\D/g, "").slice(0, 4);
     const formatado = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
-    onChange(montarValor(data, formatado));
+    setHoraDigitada(formatado);
+    if (/^\d{2}:\d{2}$/.test(formatado)) {
+      onChange(montarValor(data, formatado));
+    }
+  }
+
+  function handleHoraBlur() {
+    if (!/^\d{2}:\d{2}$/.test(horaDigitada)) {
+      setHoraDigitada(horaDoValor);
+    }
   }
 
   return (
@@ -80,8 +99,9 @@ export function DataHoraField({ id, value, onChange, minDate, disabled }: DataHo
       </Popover>
       <Input
         id={id}
-        value={hora}
+        value={horaDigitada}
         onChange={(e) => handleHoraChange(e.target.value)}
+        onBlur={handleHoraBlur}
         placeholder="HH:mm"
         inputMode="numeric"
         className="w-24 shrink-0"
