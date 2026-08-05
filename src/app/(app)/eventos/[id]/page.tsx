@@ -33,7 +33,7 @@ import { PlanoBloqueado } from "@/components/shared/plano-bloqueado";
 import { createClient } from "@/lib/supabase/client";
 import { avancarStatusEvento, deleteEvento, getEvento } from "@/services/eventos.service";
 import { formatDateTime } from "@/lib/format";
-import { PLANOS_COM_FINANCEIRO } from "@/types";
+import { PLANOS_COM_FINANCEIRO, PLANOS_COM_LISTA_PUBLICA } from "@/types";
 import type { Evento } from "@/types";
 
 export default function EventoDetailPage() {
@@ -42,6 +42,7 @@ export default function EventoDetailPage() {
   const searchParams = useSearchParams();
   const { perfil } = useAppContext();
   const temFinanceiro = PLANOS_COM_FINANCEIRO.includes(perfil.plano);
+  const temListaPublica = PLANOS_COM_LISTA_PUBLICA.includes(perfil.plano);
 
   const [evento, setEvento] = useState<Evento | null | undefined>(undefined);
   const [confirmarExcluir, setConfirmarExcluir] = useState(false);
@@ -186,7 +187,11 @@ export default function EventoDetailPage() {
             />
           ) : null}
           <InscricaoPublicaCard evento={evento} onAtualizado={setEvento} />
-          <ListaPublicaCard evento={evento} onAtualizado={setEvento} />
+          {temListaPublica ? (
+            <ListaPublicaCard evento={evento} onAtualizado={setEvento} />
+          ) : (
+            <PlanoBloqueado planoAtual={perfil.plano} planoNecessario="Intermediário" />
+          )}
           <PainelControle painel={painel} carregando={carregandoPainel} />
         </TabsContent>
 
