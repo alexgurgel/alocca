@@ -8,6 +8,7 @@ const PUBLIC_ROUTES = [
   "/cadastro",
   "/esqueci-senha",
   "/redefinir-senha",
+  "/privacidade",
 ];
 
 function isPublicRoute(pathname: string) {
