@@ -1,4 +1,4 @@
-package com.alocca.app;
+package alocca.app;
 
 import com.getcapacitor.BridgeActivity;
 

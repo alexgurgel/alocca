@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Alocca</string>
     <string name="title_activity_main">Alocca</string>
-    <string name="package_name">com.alocca.app</string>
-    <string name="custom_url_scheme">com.alocca.app</string>
+    <string name="package_name">alocca.app</string>
+    <string name="custom_url_scheme">alocca.app</string>
 </resources>
