@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import QRCode from "qrcode";
 
 let transporter: nodemailer.Transporter | null = null;
 
@@ -22,6 +23,7 @@ interface EnviarEmailConfirmacaoParams {
   funcaoNome: string;
   eventoLocal: string | null;
   eventoDataInicio: string;
+  qrToken: string;
 }
 
 export async function enviarEmailConfirmacaoFreelancer({
@@ -31,11 +33,14 @@ export async function enviarEmailConfirmacaoFreelancer({
   funcaoNome,
   eventoLocal,
   eventoDataInicio,
+  qrToken,
 }: EnviarEmailConfirmacaoParams) {
   const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
   }).format(new Date(eventoDataInicio));
+
+  const qrCodePng = await QRCode.toBuffer(qrToken, { width: 240, margin: 1 });
 
   await getTransporter().sendMail({
     from: `Alocca <${process.env.EMAIL_USER}>`,
@@ -48,8 +53,17 @@ export async function enviarEmailConfirmacaoFreelancer({
         <strong>Data:</strong> ${dataFormatada}<br />
         ${eventoLocal ? `<strong>Local:</strong> ${eventoLocal}<br />` : ""}
       </p>
+      <p>Apresente o QR code abaixo na entrada do evento para fazer seu check-in:</p>
+      <p><img src="cid:checkin-qr" alt="QR code de check-in" width="240" height="240" /></p>
       <p>Aguardamos você!</p>
       <p>Equipe Alocca</p>
     `,
+    attachments: [
+      {
+        filename: "checkin-qr.png",
+        content: qrCodePng,
+        cid: "checkin-qr",
+      },
+    ],
   });
 }

@@ -1,0 +1,118 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import QrScanner from "qr-scanner";
+import { CameraOff, Loader2, ScanLine } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { checkinPorQrToken } from "@/services/checkins.service";
+import { createClient } from "@/lib/supabase/client";
+import { STATUS_CHECKIN_LABEL } from "@/types";
+
+interface QrScannerDialogProps {
+  eventoId: string;
+  eventoDataInicio: string;
+  onCheckin?: () => void;
+}
+
+export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrScannerDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [erroCamera, setErroCamera] = useState(false);
+  const [processando, setProcessando] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const scannerRef = useRef<QrScanner | null>(null);
+  const processandoRef = useRef(false);
+
+  const handleResultado = useCallback(
+    async (qrToken: string) => {
+      if (processandoRef.current) return;
+      processandoRef.current = true;
+      setProcessando(true);
+
+      try {
+        const supabase = createClient();
+        const resultado = await checkinPorQrToken(supabase, eventoId, qrToken, eventoDataInicio);
+
+        if (!resultado) {
+          toast.error("QR code inválido para este evento.");
+        } else if (resultado.jaConfirmado) {
+          toast.info(`${resultado.nome} já estava marcado como ${STATUS_CHECKIN_LABEL[resultado.status]}.`);
+        } else {
+          toast.success(`${resultado.nome} — check-in registrado como ${STATUS_CHECKIN_LABEL[resultado.status]}.`);
+          onCheckin?.();
+        }
+      } catch {
+        toast.error("Não foi possível processar o QR code. Tente novamente.");
+      } finally {
+        setProcessando(false);
+        processandoRef.current = false;
+      }
+    },
+    [eventoId, eventoDataInicio, onCheckin]
+  );
+
+  useEffect(() => {
+    if (!open || !videoRef.current) return;
+
+    const scanner = new QrScanner(
+      videoRef.current,
+      (result) => handleResultado(result.data),
+      { highlightScanRegion: true, highlightCodeOutline: true, maxScansPerSecond: 5 }
+    );
+    scannerRef.current = scanner;
+    setErroCamera(false);
+
+    scanner.start().catch(() => setErroCamera(true));
+
+    return () => {
+      scanner.stop();
+      scanner.destroy();
+      scannerRef.current = null;
+    };
+  }, [open, handleResultado]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+        <ScanLine />
+        Escanear QR code
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Escanear QR code de check-in</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Aponte a câmera para o QR code que o freelancer recebeu por e-mail ao ser confirmado.
+          </p>
+
+          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-black">
+            <video ref={videoRef} className="size-full object-cover" muted playsInline />
+
+            {erroCamera ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/80 p-4 text-center text-sm text-white">
+                <CameraOff className="size-6" />
+                Não foi possível acessar a câmera. Verifique a permissão de câmera do app.
+              </div>
+            ) : null}
+
+            {processando ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <Loader2 className="size-6 animate-spin text-white" />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
