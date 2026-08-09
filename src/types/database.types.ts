@@ -263,6 +263,7 @@ export interface Database {
           status: StatusCheckin;
           hora_checkin: string | null;
           observacoes: string | null;
+          qr_token: string;
           created_at: string;
           updated_at: string;
         };
@@ -274,6 +275,7 @@ export interface Database {
           status?: StatusCheckin;
           hora_checkin?: string | null;
           observacoes?: string | null;
+          qr_token?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -404,6 +406,42 @@ export interface Database {
           email: string | null;
           chave_pix: string | null;
         }[];
+      };
+      empresa_publica: {
+        Args: { p_empresa_id: string };
+        Returns: {
+          id: string;
+          nome: string;
+        }[];
+      };
+      buscar_funcionario_por_cpf_empresa: {
+        Args: { p_empresa_id: string; p_cpf: string };
+        Returns: {
+          nome: string;
+          telefone: string | null;
+          email: string | null;
+          data_nascimento: string | null;
+          cidade: string | null;
+          estado: string | null;
+          chave_pix: string | null;
+          observacoes: string | null;
+        }[];
+      };
+      cadastro_publico_freelancer: {
+        Args: {
+          p_empresa_id: string;
+          p_nome: string;
+          p_cpf: string;
+          p_telefone: string;
+          p_email: string;
+          p_data_nascimento: string;
+          p_cidade: string;
+          p_estado: string;
+          p_chave_pix: string;
+          p_observacoes: string | null;
+          p_aceite_lgpd: boolean;
+        };
+        Returns: string;
       };
     };
     Enums: Record<string, never>;

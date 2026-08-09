@@ -3,6 +3,11 @@ export function getLinkConvite(conviteId: string) {
   return `${origin}/convite/${conviteId}`;
 }
 
+export function getLinkCadastroFreelancer(empresaId: string) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/cadastro-freelancer/${empresaId}`;
+}
+
 export function mensagemConvite(eventoNome: string, link: string) {
   return `Olá! Você foi convidado(a) para o evento "${eventoNome}". Veja os detalhes e responda por aqui: ${link}`;
 }
