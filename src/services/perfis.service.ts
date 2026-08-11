@@ -87,3 +87,36 @@ export async function atualizarPlanoPerfil(
   const { error } = await supabase.from("perfis").update({ plano }).eq("id", id);
   if (error) throw error;
 }
+
+export async function atualizarAtivoPerfil(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  ativo: boolean
+) {
+  const { error } = await supabase.from("perfis").update({ ativo }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function atualizarVencimentoPerfil(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  dataVencimento: string | null
+) {
+  const { error } = await supabase
+    .from("perfis")
+    .update({ data_vencimento: dataVencimento })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function atualizarLimiteUsuariosEmpresa(
+  supabase: SupabaseClient<Database>,
+  empresaId: string,
+  limite: number
+) {
+  const { error } = await supabase
+    .from("empresas")
+    .update({ limite_usuarios: limite })
+    .eq("id", empresaId);
+  if (error) throw error;
+}

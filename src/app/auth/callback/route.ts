@@ -28,9 +28,19 @@ export async function GET(request: Request) {
       nome_empresa?: string;
       nome?: string;
       aceite_lgpd?: boolean;
+      convite_equipe_token?: string;
     };
 
-    if (metadata?.nome_empresa && metadata?.nome) {
+    if (metadata?.convite_equipe_token && metadata?.nome) {
+      const { error: rpcError } = await supabase.rpc("aceitar_convite_equipe", {
+        p_token: metadata.convite_equipe_token,
+        p_nome: metadata.nome,
+      });
+
+      if (rpcError) {
+        return NextResponse.redirect(`${origin}/entrar?erro=convite`);
+      }
+    } else if (metadata?.nome_empresa && metadata?.nome) {
       const { error: rpcError } = await supabase.rpc("criar_empresa_e_perfil", {
         p_nome_empresa: metadata.nome_empresa,
         p_nome_usuario: metadata.nome,

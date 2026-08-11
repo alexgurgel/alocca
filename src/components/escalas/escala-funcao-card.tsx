@@ -136,7 +136,7 @@ export function EscalaFuncaoCard({
       {escala.convites.length > 0 ? (
         <ul className="mt-4 divide-y divide-border border-t border-border">
           {escala.convites.map((convite) => (
-            <li key={convite.id} className="flex items-center justify-between gap-3 py-2.5">
+            <li key={convite.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
               <div className="flex min-w-0 items-center gap-2.5">
                 <Avatar className="size-8">
                   <AvatarImage src={convite.funcionario.foto_url ?? undefined} alt={convite.funcionario.nome} />

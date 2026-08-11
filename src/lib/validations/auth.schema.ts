@@ -26,6 +26,19 @@ export const cadastroSchema = z
 
 export type CadastroInput = z.infer<typeof cadastroSchema>;
 
+export const aceitarConviteEquipeSchema = z
+  .object({
+    nome: nomeCompletoSchema,
+    senha: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
+    confirmarSenha: z.string().min(1, "Confirme sua senha"),
+  })
+  .refine((data) => data.senha === data.confirmarSenha, {
+    message: "As senhas não coincidem",
+    path: ["confirmarSenha"],
+  });
+
+export type AceitarConviteEquipeInput = z.infer<typeof aceitarConviteEquipeSchema>;
+
 export const esqueciSenhaSchema = z.object({
   email: z.string().min(1, "Informe seu e-mail").email("E-mail inválido"),
 });

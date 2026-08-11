@@ -34,6 +34,7 @@ export interface Database {
           email: string | null;
           endereco: string | null;
           logo_url: string | null;
+          limite_usuarios: number;
           created_at: string;
           updated_at: string;
         };
@@ -46,6 +47,7 @@ export interface Database {
           email?: string | null;
           endereco?: string | null;
           logo_url?: string | null;
+          limite_usuarios?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -67,6 +69,8 @@ export interface Database {
           status_conta: StatusConta;
           aprovado_por: string | null;
           aprovado_em: string | null;
+          ativo: boolean;
+          data_vencimento: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -84,10 +88,34 @@ export interface Database {
           status_conta?: StatusConta;
           aprovado_por?: string | null;
           aprovado_em?: string | null;
+          ativo?: boolean;
+          data_vencimento?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["perfis"]["Insert"]>;
+        Relationships: Relationship[];
+      };
+      convites_equipe: {
+        Row: {
+          id: string;
+          empresa_id: string;
+          email: string;
+          criado_por: string;
+          usado_em: string | null;
+          expira_em: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          empresa_id: string;
+          email: string;
+          criado_por: string;
+          usado_em?: string | null;
+          expira_em?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["convites_equipe"]["Insert"]>;
         Relationships: Relationship[];
       };
       funcionarios: {
@@ -292,6 +320,18 @@ export interface Database {
           p_email: string;
           p_aceite_lgpd: boolean;
         };
+        Returns: Database["public"]["Tables"]["perfis"]["Row"];
+      };
+      criar_convite_equipe: {
+        Args: { p_email: string };
+        Returns: Database["public"]["Tables"]["convites_equipe"]["Row"];
+      };
+      obter_convite_equipe: {
+        Args: { p_token: string };
+        Returns: { email: string; empresa_nome: string }[];
+      };
+      aceitar_convite_equipe: {
+        Args: { p_token: string; p_nome: string };
         Returns: Database["public"]["Tables"]["perfis"]["Row"];
       };
       current_empresa_id: {

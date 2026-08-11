@@ -19,6 +19,7 @@ function isPublicRoute(pathname: string) {
   if (pathname.startsWith("/inscricao/")) return true;
   if (pathname.startsWith("/cadastro-freelancer/")) return true;
   if (pathname.startsWith("/lista-confirmados/")) return true;
+  if (pathname.startsWith("/equipe/aceitar/")) return true;
   return false;
 }
 

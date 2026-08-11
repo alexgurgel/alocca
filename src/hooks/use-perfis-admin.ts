@@ -5,7 +5,10 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import {
   aprovarPerfil,
+  atualizarAtivoPerfil,
+  atualizarLimiteUsuariosEmpresa,
   atualizarPlanoPerfil,
+  atualizarVencimentoPerfil,
   listPerfisAdmins,
   recusarPerfil,
   type PerfilComEmpresa,
@@ -63,5 +66,45 @@ export function usePerfisAdmin() {
     [recarregar]
   );
 
-  return { perfis, carregando, aprovar, recusar, atualizarPlano, recarregar };
+  const atualizarAtivo = useCallback(
+    async (id: string, ativo: boolean) => {
+      const supabase = createClient();
+      await atualizarAtivoPerfil(supabase, id, ativo);
+      toast.success(ativo ? "Cadastro reativado." : "Cadastro inativado.");
+      await recarregar();
+    },
+    [recarregar]
+  );
+
+  const atualizarVencimento = useCallback(
+    async (id: string, dataVencimento: string | null) => {
+      const supabase = createClient();
+      await atualizarVencimentoPerfil(supabase, id, dataVencimento);
+      toast.success(dataVencimento ? "Data de vencimento atualizada." : "Vencimento removido.");
+      await recarregar();
+    },
+    [recarregar]
+  );
+
+  const atualizarLimiteUsuarios = useCallback(
+    async (empresaId: string, limite: number) => {
+      const supabase = createClient();
+      await atualizarLimiteUsuariosEmpresa(supabase, empresaId, limite);
+      toast.success("Limite de usuários atualizado.");
+      await recarregar();
+    },
+    [recarregar]
+  );
+
+  return {
+    perfis,
+    carregando,
+    aprovar,
+    recusar,
+    atualizarPlano,
+    atualizarAtivo,
+    atualizarVencimento,
+    atualizarLimiteUsuarios,
+    recarregar,
+  };
 }
