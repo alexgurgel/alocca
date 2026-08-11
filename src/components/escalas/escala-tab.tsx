@@ -25,7 +25,7 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground">Escala do evento</h3>
           <p className="text-xs text-muted-foreground">

@@ -53,3 +53,31 @@ export async function enviarEmailConfirmacaoFreelancer({
     `,
   });
 }
+
+interface EnviarConviteEquipeParams {
+  paraEmail: string;
+  empresaNome: string;
+  nomeConvidante: string;
+  link: string;
+}
+
+export async function enviarConviteEquipe({
+  paraEmail,
+  empresaNome,
+  nomeConvidante,
+  link,
+}: EnviarConviteEquipeParams) {
+  await getTransporter().sendMail({
+    from: `Alocca <${process.env.EMAIL_USER}>`,
+    to: paraEmail,
+    subject: `Você foi convidado para a equipe de ${empresaNome} na Alocca`,
+    html: `
+      <p>Olá!</p>
+      <p>${nomeConvidante} convidou você para acessar a conta de <strong>${empresaNome}</strong> na Alocca.</p>
+      <p>Clique no link abaixo para criar sua senha e começar a usar:</p>
+      <p><a href="${link}">${link}</a></p>
+      <p>Se você não esperava esse convite, pode ignorar este e-mail.</p>
+      <p>Equipe Alocca</p>
+    `,
+  });
+}

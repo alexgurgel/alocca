@@ -171,12 +171,14 @@ export default function EventoDetailPage() {
       </div>
 
       <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
-        <TabsList>
-          <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
-          <TabsTrigger value="escala">Escala</TabsTrigger>
-          <TabsTrigger value="checkin">Check-in</TabsTrigger>
-          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList>
+            <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
+            <TabsTrigger value="escala">Escala</TabsTrigger>
+            <TabsTrigger value="checkin">Check-in</TabsTrigger>
+            <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="visao-geral" className="space-y-4 pt-4">
           {eventoVencido ? (

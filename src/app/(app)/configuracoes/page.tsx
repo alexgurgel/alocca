@@ -5,11 +5,13 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmpresaForm } from "@/components/configuracoes/empresa-form";
 import { FuncoesManager } from "@/components/configuracoes/funcoes-manager";
+import { EquipeTab } from "@/components/configuracoes/equipe-tab";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Building2 } from "lucide-react";
 
 export default function ConfiguracoesPage() {
   const { perfil, empresa } = useAppContext();
+  const temMultiplosAcessos = (empresa?.limite_usuarios ?? 1) > 1;
 
   return (
     <div className="space-y-6">
@@ -19,6 +21,7 @@ export default function ConfiguracoesPage() {
         <TabsList>
           <TabsTrigger value="empresa">Empresa</TabsTrigger>
           <TabsTrigger value="funcoes">Funções</TabsTrigger>
+          {temMultiplosAcessos ? <TabsTrigger value="equipe">Equipe</TabsTrigger> : null}
         </TabsList>
 
         <TabsContent value="empresa" className="pt-4">
@@ -36,6 +39,14 @@ export default function ConfiguracoesPage() {
             <FuncoesManager empresaId={perfil.empresa_id ?? undefined} />
           </div>
         </TabsContent>
+
+        {temMultiplosAcessos && empresa ? (
+          <TabsContent value="equipe" className="pt-4">
+            <div className="max-w-2xl">
+              <EquipeTab empresa={empresa} />
+            </div>
+          </TabsContent>
+        ) : null}
       </Tabs>
     </div>
   );

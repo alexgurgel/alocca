@@ -27,6 +27,7 @@ export type Evento = Database["public"]["Tables"]["eventos"]["Row"];
 export type EventoFuncao = Database["public"]["Tables"]["evento_funcoes"]["Row"];
 export type Convite = Database["public"]["Tables"]["convites"]["Row"];
 export type Checkin = Database["public"]["Tables"]["checkins"]["Row"];
+export type ConviteEquipe = Database["public"]["Tables"]["convites_equipe"]["Row"];
 
 export interface FuncionarioComFuncoes extends Funcionario {
   funcoes: Funcao[];

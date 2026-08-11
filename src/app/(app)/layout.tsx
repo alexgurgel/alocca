@@ -30,9 +30,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       nome_empresa?: string;
       nome?: string;
       aceite_lgpd?: boolean;
+      convite_equipe_token?: string;
     };
 
-    if (metadata?.nome_empresa && metadata?.nome) {
+    if (metadata?.convite_equipe_token && metadata?.nome) {
+      const { data: perfilCriado } = await supabase.rpc("aceitar_convite_equipe", {
+        p_token: metadata.convite_equipe_token,
+        p_nome: metadata.nome,
+      });
+      perfil = perfilCriado ?? null;
+    } else if (metadata?.nome_empresa && metadata?.nome) {
       const { data: perfilCriado } = await supabase.rpc("criar_empresa_e_perfil", {
         p_nome_empresa: metadata.nome_empresa,
         p_nome_usuario: metadata.nome,
@@ -53,6 +60,18 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   if (perfil.status_conta !== "aprovado") {
     redirect("/aguardando-aprovacao");
+  }
+
+  // Admin da plataforma tem acesso vitalicio — inativacao e vencimento
+  // nao se aplicam a essas contas.
+  if (perfil.plano !== "admin") {
+    if (!perfil.ativo) {
+      redirect("/conta-inativa?motivo=inativado");
+    }
+    const hoje = new Date().toISOString().slice(0, 10);
+    if (perfil.data_vencimento && perfil.data_vencimento < hoje) {
+      redirect("/conta-inativa?motivo=vencido");
+    }
   }
 
   const { data: empresa } = perfil.empresa_id
