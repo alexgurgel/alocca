@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   appName: 'Alocca',
   webDir: 'public',
   server: {
-    url: 'https://alocca.vercel.app',
+    url: 'https://alocca.app.br',
     cleartext: false,
   },
 };
