@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Link2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppContext } from "@/components/providers/app-provider";
@@ -16,6 +16,7 @@ import { ColaboradoresTable } from "@/components/colaboradores/colaboradores-tab
 import { ColaboradoresToolbar } from "@/components/colaboradores/colaboradores-toolbar";
 import { createClient } from "@/lib/supabase/client";
 import { deleteFuncionario } from "@/services/funcionarios.service";
+import { getLinkCadastroFreelancer } from "@/lib/convite-links";
 import type { FuncionarioComFuncoes } from "@/types";
 
 export default function ColaboradoresPage() {
@@ -56,16 +57,28 @@ export default function ColaboradoresPage() {
     }
   }
 
+  async function copiarLinkCadastro() {
+    if (!empresaId) return;
+    await navigator.clipboard.writeText(getLinkCadastroFreelancer(empresaId));
+    toast.success("Link de cadastro copiado. Envie para o freelancer se juntar à sua equipe.");
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Freelancers"
         description="Gerencie a equipe disponível para escalar em seus eventos."
         actions={
-          <Button render={<Link href="/colaboradores/novo" />}>
-            <Plus />
-            Novo freelancer
-          </Button>
+          <>
+            <Button variant="outline" onClick={copiarLinkCadastro}>
+              <Link2 />
+              Copiar link de cadastro
+            </Button>
+            <Button render={<Link href="/colaboradores/novo" />}>
+              <Plus />
+              Novo freelancer
+            </Button>
+          </>
         }
       />
 

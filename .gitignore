@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# materiais de submissao da Play Store (icones, screenshots) - so local
+playstore-assets/

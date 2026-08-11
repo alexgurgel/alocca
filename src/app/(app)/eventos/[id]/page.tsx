@@ -202,7 +202,7 @@ export default function EventoDetailPage() {
         </TabsContent>
 
         <TabsContent value="checkin" className="pt-4">
-          <CheckinList eventoId={evento.id} />
+          <CheckinList eventoId={evento.id} eventoDataInicio={evento.data_inicio} />
         </TabsContent>
 
         <TabsContent value="financeiro" className="pt-4">

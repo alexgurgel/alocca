@@ -8,6 +8,8 @@ const PUBLIC_ROUTES = [
   "/cadastro",
   "/esqueci-senha",
   "/redefinir-senha",
+  "/privacidade",
+  "/exclusao-de-conta",
 ];
 
 function isPublicRoute(pathname: string) {
@@ -15,6 +17,7 @@ function isPublicRoute(pathname: string) {
   if (pathname.startsWith("/auth/")) return true;
   if (pathname.startsWith("/convite/")) return true;
   if (pathname.startsWith("/inscricao/")) return true;
+  if (pathname.startsWith("/cadastro-freelancer/")) return true;
   if (pathname.startsWith("/lista-confirmados/")) return true;
   if (pathname.startsWith("/equipe/aceitar/")) return true;
   return false;

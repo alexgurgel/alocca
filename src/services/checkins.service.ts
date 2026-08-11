@@ -76,6 +76,51 @@ export async function listConfirmadosSemCheckinResolvido(
   }));
 }
 
+export interface ResultadoScanQr {
+  nome: string;
+  status: StatusCheckin;
+  jaConfirmado: boolean;
+}
+
+/**
+ * Processa a leitura de um QR code de check-in: localiza o checkin pelo
+ * token (escopado ao evento aberto, para nao aceitar QR de outro evento)
+ * e aplica "presente" ou "atrasado" automaticamente, com base numa
+ * tolerancia de 15 minutos apos o horario de inicio do evento. Se o
+ * check-in ja tiver sido resolvido antes, nao reprocessa — so informa.
+ */
+export async function checkinPorQrToken(
+  supabase: SupabaseClient<Database>,
+  eventoId: string,
+  qrToken: string,
+  eventoDataInicio: string
+): Promise<ResultadoScanQr | null> {
+  const { data, error } = await supabase
+    .from("checkins")
+    .select("id, status, funcionario:funcionarios(nome)")
+    .eq("evento_id", eventoId)
+    .eq("qr_token", qrToken)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  type Row = { id: string; status: StatusCheckin; funcionario: { nome: string } };
+  const row = data as unknown as Row;
+
+  if (row.status !== "pendente") {
+    return { nome: row.funcionario.nome, status: row.status, jaConfirmado: true };
+  }
+
+  const TOLERANCIA_MINUTOS = 15;
+  const limite = new Date(eventoDataInicio).getTime() + TOLERANCIA_MINUTOS * 60 * 1000;
+  const novoStatus: StatusCheckin = Date.now() <= limite ? "presente" : "atrasado";
+
+  await atualizarStatusCheckin(supabase, row.id, novoStatus);
+
+  return { nome: row.funcionario.nome, status: novoStatus, jaConfirmado: false };
+}
+
 export async function atualizarStatusCheckin(
   supabase: SupabaseClient<Database>,
   id: string,

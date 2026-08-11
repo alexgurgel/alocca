@@ -7,7 +7,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // escondido: o Capacitor da acesso a APIs nativas de verdade, como push
 // notification, camera etc., quando forem adicionadas).
 const config: CapacitorConfig = {
-  appId: 'com.alocca.app',
+  appId: 'alocca.app',
   appName: 'Alocca',
   webDir: 'public',
   server: {

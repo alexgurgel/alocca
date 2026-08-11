@@ -5,12 +5,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckinStatusButtons } from "./checkin-status-buttons";
+import { QrScannerDialog } from "./qr-scanner-dialog";
 import { useCheckin } from "@/hooks/use-checkin";
 import { getInitials } from "@/lib/format";
 import { STATUS_CHECKIN_LABEL } from "@/types";
 
-export function CheckinList({ eventoId }: { eventoId: string }) {
-  const { checkins, carregando, marcarStatus } = useCheckin(eventoId);
+interface CheckinListProps {
+  eventoId: string;
+  eventoDataInicio: string;
+}
+
+export function CheckinList({ eventoId, eventoDataInicio }: CheckinListProps) {
+  const { checkins, carregando, marcarStatus, recarregar } = useCheckin(eventoId);
 
   const contagem = {
     presente: checkins.filter((c) => c.status === "presente").length,
@@ -41,19 +47,23 @@ export function CheckinList({ eventoId }: { eventoId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-4 text-sm">
-        <span className="text-muted-foreground">
-          Presentes <span className="font-semibold text-foreground">{contagem.presente}</span>
-        </span>
-        <span className="text-muted-foreground">
-          Atrasados <span className="font-semibold text-foreground">{contagem.atrasado}</span>
-        </span>
-        <span className="text-muted-foreground">
-          Ausentes <span className="font-semibold text-foreground">{contagem.ausente}</span>
-        </span>
-        <span className="text-muted-foreground">
-          Pendentes <span className="font-semibold text-foreground">{contagem.pendente}</span>
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-4 text-sm">
+          <span className="text-muted-foreground">
+            Presentes <span className="font-semibold text-foreground">{contagem.presente}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Atrasados <span className="font-semibold text-foreground">{contagem.atrasado}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Ausentes <span className="font-semibold text-foreground">{contagem.ausente}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Pendentes <span className="font-semibold text-foreground">{contagem.pendente}</span>
+          </span>
+        </div>
+
+        <QrScannerDialog eventoId={eventoId} eventoDataInicio={eventoDataInicio} onCheckin={recarregar} />
       </div>
 
       <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
