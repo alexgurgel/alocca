@@ -79,8 +79,8 @@ export async function enviarConviteEquipe({
   nomeConvidante,
   link,
 }: EnviarConviteEquipeParams) {
-  await getTransporter().sendMail({
-    from: `Alocca <${process.env.EMAIL_USER}>`,
+  const { error } = await getResend().emails.send({
+    from: "Alocca <contato@alocca.app.br>",
     to: paraEmail,
     subject: `Você foi convidado para a equipe de ${empresaNome} na Alocca`,
     html: `
@@ -92,4 +92,8 @@ export async function enviarConviteEquipe({
       <p>Equipe Alocca</p>
     `,
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
