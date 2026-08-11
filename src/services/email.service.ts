@@ -1,19 +1,13 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import QRCode from "qrcode";
 
-let transporter: nodemailer.Transporter | null = null;
+let resend: Resend | null = null;
 
-function getTransporter() {
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
   }
-  return transporter;
+  return resend;
 }
 
 interface EnviarEmailConfirmacaoParams {
@@ -42,8 +36,8 @@ export async function enviarEmailConfirmacaoFreelancer({
 
   const qrCodePng = await QRCode.toBuffer(qrToken, { width: 240, margin: 1 });
 
-  await getTransporter().sendMail({
-    from: `Alocca <${process.env.EMAIL_USER}>`,
+  const { error } = await getResend().emails.send({
+    from: "Alocca <contato@alocca.app.br>",
     to: paraEmail,
     subject: `Você foi confirmado para ${eventoNome}`,
     html: `
@@ -62,8 +56,12 @@ export async function enviarEmailConfirmacaoFreelancer({
       {
         filename: "checkin-qr.png",
         content: qrCodePng,
-        cid: "checkin-qr",
+        contentId: "checkin-qr",
       },
     ],
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
