@@ -163,7 +163,7 @@ export function EscalaFuncaoCard({
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex flex-wrap shrink-0 items-center gap-1.5">
                 <StatusBadge
                   label={STATUS_CONVITE_LABEL[convite.status]}
                   tone={STATUS_CONVITE_TONE[convite.status]}
@@ -171,26 +171,22 @@ export function EscalaFuncaoCard({
 
                 {convite.origem === "candidatura" && convite.status === "pendente" ? (
                   <>
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      title="Aprovar candidatura"
-                      className="text-muted-foreground hover:text-primary"
                       onClick={() => onAvaliarCandidatura(convite.id, "aceito", escala.valor_diaria)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--success)] bg-[var(--success)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
                     >
                       <Check className="size-3.5" />
-                    </Button>
-                    <Button
+                      Aceitar
+                    </button>
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      title="Recusar candidatura"
-                      className="text-muted-foreground hover:text-destructive"
                       onClick={() => onAvaliarCandidatura(convite.id, "recusado", null)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-destructive bg-destructive px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
                     >
                       <X className="size-3.5" />
-                    </Button>
+                      Recusar
+                    </button>
                   </>
                 ) : null}
 
