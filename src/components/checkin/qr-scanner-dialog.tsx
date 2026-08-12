@@ -28,7 +28,11 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
   const [erroCamera, setErroCamera] = useState(false);
   const [carregandoCamera, setCarregandoCamera] = useState(true);
   const [processando, setProcessando] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // Estado (nao useRef) porque o <video> so existe no DOM depois que o
+  // Dialog termina de montar/animar — um useRef comum podia ficar nulo
+  // no momento em que o efeito abaixo rodava, fazendo o scanner nunca
+  // ser iniciado (e o navegador nunca pedir permissao de camera).
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const scannerRef = useRef<QrScanner | null>(null);
   const processandoRef = useRef(false);
 
@@ -61,7 +65,7 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
   );
 
   useEffect(() => {
-    if (!open || !videoRef.current) return;
+    if (!open || !videoEl) return;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setErroCamera(true);
@@ -70,7 +74,7 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
     }
 
     const scanner = new QrScanner(
-      videoRef.current,
+      videoEl,
       (result) => handleResultado(result.data),
       { highlightScanRegion: true, highlightCodeOutline: true, maxScansPerSecond: 5 }
     );
@@ -91,7 +95,7 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
       scanner.destroy();
       scannerRef.current = null;
     };
-  }, [open, handleResultado]);
+  }, [open, videoEl, handleResultado]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -110,7 +114,7 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
           </p>
 
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-black">
-            <video ref={videoRef} className="size-full object-cover" muted playsInline />
+            <video ref={setVideoEl} className="size-full object-cover" muted playsInline />
 
             {carregandoCamera && !erroCamera ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90 p-4 text-center text-sm text-white">
