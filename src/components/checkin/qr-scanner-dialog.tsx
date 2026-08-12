@@ -26,6 +26,7 @@ interface QrScannerDialogProps {
 export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrScannerDialogProps) {
   const [open, setOpen] = useState(false);
   const [erroCamera, setErroCamera] = useState(false);
+  const [carregandoCamera, setCarregandoCamera] = useState(true);
   const [processando, setProcessando] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
@@ -62,6 +63,12 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
   useEffect(() => {
     if (!open || !videoRef.current) return;
 
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setErroCamera(true);
+      setCarregandoCamera(false);
+      return;
+    }
+
     const scanner = new QrScanner(
       videoRef.current,
       (result) => handleResultado(result.data),
@@ -69,8 +76,15 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
     );
     scannerRef.current = scanner;
     setErroCamera(false);
+    setCarregandoCamera(true);
 
-    scanner.start().catch(() => setErroCamera(true));
+    scanner
+      .start()
+      .then(() => setCarregandoCamera(false))
+      .catch(() => {
+        setErroCamera(true);
+        setCarregandoCamera(false);
+      });
 
     return () => {
       scanner.stop();
@@ -98,10 +112,21 @@ export function QrScannerDialog({ eventoId, eventoDataInicio, onCheckin }: QrSca
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-black">
             <video ref={videoRef} className="size-full object-cover" muted playsInline />
 
+            {carregandoCamera && !erroCamera ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90 p-4 text-center text-sm text-white">
+                <Loader2 className="size-6 animate-spin" />
+                Aguardando permissão da câmera — se o navegador mostrou um aviso pedindo acesso, clique em &quot;Permitir&quot;.
+              </div>
+            ) : null}
+
             {erroCamera ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/80 p-4 text-center text-sm text-white">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90 p-4 text-center text-sm text-white">
                 <CameraOff className="size-6" />
-                Não foi possível acessar a câmera. Verifique a permissão de câmera do app.
+                <p>Não foi possível acessar a câmera.</p>
+                <p className="text-xs text-white/70">
+                  Se você negou o acesso antes, clique no ícone de cadeado/câmera na barra de endereço do
+                  navegador e permita a câmera para este site, depois feche e abra este scanner de novo.
+                </p>
               </div>
             ) : null}
 
