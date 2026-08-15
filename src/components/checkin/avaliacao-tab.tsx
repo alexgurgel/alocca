@@ -9,12 +9,16 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AvaliacaoButtons } from "./avaliacao-buttons";
-import { useCheckin } from "@/hooks/use-checkin";
+import type { useCheckin } from "@/hooks/use-checkin";
 import { getInitials } from "@/lib/format";
 import { AVALIACAO_LABEL } from "@/types";
 
-export function AvaliacaoTab({ eventoId }: { eventoId: string }) {
-  const { checkins, carregando, marcarAvaliacao, avaliarTodos } = useCheckin(eventoId);
+type AvaliacaoTabProps = Pick<
+  ReturnType<typeof useCheckin>,
+  "checkins" | "carregando" | "marcarAvaliacao" | "avaliarTodos"
+>;
+
+export function AvaliacaoTab({ checkins, carregando, marcarAvaliacao, avaliarTodos }: AvaliacaoTabProps) {
   const [busca, setBusca] = useState("");
 
   const filtrados = useMemo(() => {
