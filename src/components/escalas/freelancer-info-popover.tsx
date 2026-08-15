@@ -31,13 +31,13 @@ export function FreelancerInfoPopover({ funcionario, children }: FreelancerInfoP
         render={
           <button
             type="button"
-            className="truncate text-left text-sm font-medium text-foreground hover:underline"
+            className="min-w-0 max-w-full truncate text-left text-sm font-medium text-foreground hover:underline"
           />
         }
       >
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-72" align="start">
+      <PopoverContent className="w-72 max-w-[calc(100vw-2rem)]" align="start">
         <p className="mb-2 text-sm font-semibold text-foreground">{funcionario.nome}</p>
         {campos.length === 0 ? (
           <p className="text-xs text-muted-foreground">Nenhum dado de contato cadastrado.</p>

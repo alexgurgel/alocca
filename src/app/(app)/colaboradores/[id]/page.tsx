@@ -79,7 +79,7 @@ export default function EditarColaboradorPage() {
     <div className="space-y-6">
       <PageHeader
         title={
-          <span className="flex items-center gap-2">
+          <span className="flex flex-wrap items-center gap-2">
             {colaborador.nome}
             <NotaMediaBadge notaMedia={nota?.notaMedia} totalAvaliacoes={nota?.totalAvaliacoes} />
           </span>

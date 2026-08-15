@@ -178,9 +178,9 @@ export function ConvidarColaboradorDialog({
                                   );
                                 }}
                               >
-                                <Check className={cn("size-4", marcado ? "opacity-100" : "opacity-0")} />
-                                <span className="flex flex-1 items-center justify-between gap-2">
-                                  {freelancer.nome}
+                                <Check className={cn("size-4 shrink-0", marcado ? "opacity-100" : "opacity-0")} />
+                                <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                                  <span className="truncate">{freelancer.nome}</span>
                                   <NotaMediaBadge
                                     notaMedia={notas[freelancer.id]?.notaMedia}
                                     totalAvaliacoes={notas[freelancer.id]?.totalAvaliacoes}
