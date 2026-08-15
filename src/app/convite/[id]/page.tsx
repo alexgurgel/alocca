@@ -40,6 +40,13 @@ export default function ConvitePublicoPage() {
       const supabase = createClient();
       await responderContePublico(supabase, convite.id, status);
       toast.success(status === "aceito" ? "Convite aceito!" : "Convite recusado.");
+      if (status === "aceito") {
+        fetch("/api/notificar-confirmacao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conviteId: convite.id }),
+        }).catch(() => {});
+      }
       await carregar();
     } catch {
       toast.error("Não foi possível registrar sua resposta.");

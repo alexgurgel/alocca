@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ConvidarColaboradorDialog } from "./convidar-colaborador-dialog";
+import { FreelancerInfoPopover } from "./freelancer-info-popover";
 import { getInitials, formatCurrencyBRL } from "@/lib/format";
 import { getLinkConvite, getLinkEmail, getLinkWhatsApp, mensagemConvite } from "@/lib/convite-links";
-import { STATUS_CONVITE_LABEL, type EscalaFuncao } from "@/types";
+import { STATUS_CONVITE_LABEL, type ConviteComRelacoes, type EscalaFuncao } from "@/types";
 import { STATUS_CONVITE_TONE } from "@/lib/constants";
 import type { ConvidarColaboradorInput } from "@/lib/validations/escala.schema";
 
@@ -21,7 +22,7 @@ interface EscalaFuncaoCardProps {
   onAtualizarVagas: (id: string, vagas: number) => Promise<void>;
   onAtualizarValorDiaria: (id: string, valorDiaria: number) => Promise<void>;
   onRemoverFuncao: (id: string) => Promise<void>;
-  onConvidar: (funcaoId: string, input: ConvidarColaboradorInput) => Promise<void>;
+  onConvidar: (funcaoId: string, input: ConvidarColaboradorInput) => Promise<ConviteComRelacoes[]>;
   onCancelarConvite: (conviteId: string) => Promise<void>;
   onAvaliarCandidatura: (
     conviteId: string,
@@ -61,6 +62,62 @@ export function EscalaFuncaoCard({
     }
     if (novoValor !== escala.valor_diaria) {
       onAtualizarValorDiaria(escala.id, novoValor);
+    }
+  }
+
+  async function handleConvidar(input: ConvidarColaboradorInput) {
+    const criados = await onConvidar(escala.funcao_id, input);
+    if (criados.length === 0) return;
+
+    if (input.canal === "whatsapp") {
+      const semTelefone: string[] = [];
+      criados.forEach((convite, indice) => {
+        const link = getLinkWhatsApp(
+          convite.funcionario.telefone,
+          mensagemConvite(eventoNome, getLinkConvite(convite.id))
+        );
+        if (!link) {
+          semTelefone.push(convite.funcionario.nome);
+          return;
+        }
+        setTimeout(() => window.open(link, "_blank", "noopener,noreferrer"), indice * 350);
+      });
+      if (semTelefone.length > 0) {
+        toast.error(`Sem telefone cadastrado: ${semTelefone.join(", ")}. Convite criado, mas não enviado por WhatsApp.`);
+      } else {
+        toast.success(
+          criados.length > 1 ? "Abrindo o WhatsApp para cada freelancer…" : "Abrindo o WhatsApp…"
+        );
+      }
+      return;
+    }
+
+    const comEmail = criados.filter((c) => c.funcionario.email);
+    const semEmail = criados.filter((c) => !c.funcionario.email);
+
+    const resultados = await Promise.all(
+      comEmail.map((c) =>
+        fetch("/api/enviar-convite-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conviteId: c.id }),
+        })
+          .then((res) => res.ok)
+          .catch(() => false)
+      )
+    );
+    const falhas = resultados.filter((ok) => !ok).length;
+
+    if (semEmail.length > 0) {
+      toast.error(`Sem e-mail cadastrado: ${semEmail.map((c) => c.funcionario.nome).join(", ")}.`);
+    }
+    if (falhas > 0) {
+      toast.error(`Não foi possível enviar o e-mail para ${falhas} freelancer(s).`);
+    }
+    if (comEmail.length > falhas) {
+      toast.success(
+        comEmail.length > 1 ? "Convites enviados por e-mail." : "Convite enviado por e-mail."
+      );
     }
   }
 
@@ -118,7 +175,7 @@ export function EscalaFuncaoCard({
             idsJaConvidados={escala.convites.map((c) => c.funcionario_id)}
             valorPadrao={escala.valor_diaria}
             vagasPreenchidas={preenchidas >= escala.vagas}
-            onConvidar={(input) => onConvidar(escala.funcao_id, input)}
+            onConvidar={handleConvidar}
           />
 
           <Button
@@ -146,9 +203,9 @@ export function EscalaFuncaoCard({
                 </Avatar>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="truncate text-sm font-medium text-foreground">
+                    <FreelancerInfoPopover funcionario={convite.funcionario}>
                       {convite.funcionario.nome}
-                    </p>
+                    </FreelancerInfoPopover>
                     {convite.origem === "candidatura" ? (
                       <span className="shrink-0 rounded-full bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-medium text-cyan-600 dark:text-cyan-400">
                         Candidatura

@@ -29,6 +29,7 @@ import { FinalizarEventoCard } from "@/components/eventos/finalizar-evento-card"
 import { RelatorioFinanceiroTab } from "@/components/eventos/relatorio-financeiro-tab";
 import { EscalaTab } from "@/components/escalas/escala-tab";
 import { CheckinList } from "@/components/checkin/checkin-list";
+import { AvaliacaoTab } from "@/components/checkin/avaliacao-tab";
 import { PlanoBloqueado } from "@/components/shared/plano-bloqueado";
 import { createClient } from "@/lib/supabase/client";
 import { avancarStatusEvento, deleteEvento, getEvento } from "@/services/eventos.service";
@@ -176,6 +177,7 @@ export default function EventoDetailPage() {
             <TabsTrigger value="visao-geral">Visão geral</TabsTrigger>
             <TabsTrigger value="escala">Escala</TabsTrigger>
             <TabsTrigger value="checkin">Check-in</TabsTrigger>
+            <TabsTrigger value="avaliacao">Avaliação</TabsTrigger>
             <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
           </TabsList>
         </div>
@@ -203,6 +205,10 @@ export default function EventoDetailPage() {
 
         <TabsContent value="checkin" className="pt-4">
           <CheckinList eventoId={evento.id} eventoDataInicio={evento.data_inicio} />
+        </TabsContent>
+
+        <TabsContent value="avaliacao" className="pt-4">
+          <AvaliacaoTab eventoId={evento.id} />
         </TabsContent>
 
         <TabsContent value="financeiro" className="pt-4">

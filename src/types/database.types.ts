@@ -12,6 +12,7 @@ export type StatusCheckin = "pendente" | "presente" | "ausente" | "atrasado";
 export type PapelUsuario = "admin" | "colaborador";
 export type PlanoAcesso = "free" | "intermediario" | "master" | "admin";
 export type StatusConta = "pendente" | "aprovado" | "recusado";
+export type AvaliacaoFreelancer = "recomendo" | "ok" | "nao_recomendo";
 
 type Relationship = {
   foreignKeyName: string;
@@ -292,6 +293,7 @@ export interface Database {
           hora_checkin: string | null;
           observacoes: string | null;
           qr_token: string;
+          avaliacao: AvaliacaoFreelancer | null;
           created_at: string;
           updated_at: string;
         };
@@ -304,6 +306,7 @@ export interface Database {
           hora_checkin?: string | null;
           observacoes?: string | null;
           qr_token?: string;
+          avaliacao?: AvaliacaoFreelancer | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -333,6 +336,22 @@ export interface Database {
       aceitar_convite_equipe: {
         Args: { p_token: string; p_nome: string };
         Returns: Database["public"]["Tables"]["perfis"]["Row"];
+      };
+      preparar_checkin_confirmacao: {
+        Args: { p_convite_id: string };
+        Returns: {
+          funcionario_nome: string;
+          funcionario_email: string | null;
+          funcao_nome: string;
+          evento_nome: string;
+          evento_local: string | null;
+          evento_data_inicio: string;
+          qr_token: string;
+        }[];
+      };
+      obter_notas_funcionarios: {
+        Args: { p_funcionario_ids: string[] };
+        Returns: { funcionario_id: string; nota_media: number; total_avaliacoes: number }[];
       };
       current_empresa_id: {
         Args: Record<string, never>;
