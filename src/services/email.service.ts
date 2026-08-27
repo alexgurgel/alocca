@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import QRCode from "qrcode";
+import { formatDateTime } from "@/lib/format";
 
 let resend: Resend | null = null;
 
@@ -29,10 +30,7 @@ export async function enviarEmailConfirmacaoFreelancer({
   eventoDataInicio,
   qrToken,
 }: EnviarEmailConfirmacaoParams) {
-  const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(eventoDataInicio));
+  const dataFormatada = formatDateTime(eventoDataInicio);
 
   const qrCodePng = await QRCode.toBuffer(qrToken, { width: 240, margin: 1 });
 
@@ -85,10 +83,7 @@ export async function enviarEmailConvite({
   eventoDataInicio,
   linkConvite,
 }: EnviarEmailConviteParams) {
-  const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(eventoDataInicio));
+  const dataFormatada = formatDateTime(eventoDataInicio);
 
   const { error } = await getResend().emails.send({
     from: "Alocca <contato@alocca.app.br>",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Mail, MessageCircle, Minus, Plus, Trash2, X, Link2 } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Mail, MessageCircle, Minus, Plus, Trash2, X, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { getLinkConvite, getLinkEmail, getLinkWhatsApp, mensagemConvite } from "
 import { STATUS_CONVITE_LABEL, type ConviteComRelacoes, type EscalaFuncao } from "@/types";
 import { STATUS_CONVITE_TONE } from "@/lib/constants";
 import type { ConvidarColaboradorInput } from "@/lib/validations/escala.schema";
+
+const LIMITE_VISIVEIS = 10;
 
 interface EscalaFuncaoCardProps {
   empresaId: string;
@@ -43,10 +45,14 @@ export function EscalaFuncaoCard({
   onAvaliarCandidatura,
 }: EscalaFuncaoCardProps) {
   const [confirmarRemover, setConfirmarRemover] = useState(false);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
   const [valorDiariaInput, setValorDiariaInput] = useState(
     escala.valor_diaria != null ? String(escala.valor_diaria) : ""
   );
   const preenchidas = escala.convites.filter((c) => c.status === "aceito").length;
+  const temMaisQueLimite = escala.convites.length > LIMITE_VISIVEIS;
+  const convitesVisiveis =
+    mostrarTodos || !temMaisQueLimite ? escala.convites : escala.convites.slice(0, LIMITE_VISIVEIS);
 
   async function copiarLink(conviteId: string) {
     const link = getLinkConvite(conviteId);
@@ -192,7 +198,7 @@ export function EscalaFuncaoCard({
 
       {escala.convites.length > 0 ? (
         <ul className="mt-4 divide-y divide-border border-t border-border">
-          {escala.convites.map((convite) => (
+          {convitesVisiveis.map((convite) => (
             <li key={convite.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
               <div className="flex min-w-0 items-center gap-2.5">
                 <Avatar className="size-8">
@@ -319,11 +325,33 @@ export function EscalaFuncaoCard({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : null}
+
+      {temMaisQueLimite ? (
+        <button
+          type="button"
+          onClick={() => setMostrarTodos((atual) => !atual)}
+          className="mt-2 flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          {mostrarTodos ? (
+            <>
+              <ChevronUp className="size-3.5" />
+              Recolher
+            </>
+          ) : (
+            <>
+              <ChevronDown className="size-3.5" />
+              Ver mais ({escala.convites.length - LIMITE_VISIVEIS})
+            </>
+          )}
+        </button>
+      ) : null}
+
+      {escala.convites.length === 0 ? (
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
           Nenhum freelancer convidado para esta função ainda.
         </p>
-      )}
+      ) : null}
 
       <ConfirmDialog
         open={confirmarRemover}
