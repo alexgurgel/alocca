@@ -11,6 +11,8 @@ import { ColaboradorForm } from "@/components/colaboradores/colaborador-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { createClient } from "@/lib/supabase/client";
 import { getFuncionario } from "@/services/funcionarios.service";
+import { obterNotasFuncionarios, type NotaFuncionario } from "@/services/checkins.service";
+import { NotaMediaBadge } from "@/components/shared/nota-media-badge";
 import type { FuncionarioComFuncoes } from "@/types";
 import { UserX } from "lucide-react";
 
@@ -23,12 +25,24 @@ export default function EditarColaboradorPage() {
   const [colaborador, setColaborador] = useState<FuncionarioComFuncoes | null | undefined>(
     undefined
   );
+  const [nota, setNota] = useState<NotaFuncionario | undefined>(undefined);
 
   useEffect(() => {
     let ativo = true;
     const supabase = createClient();
     getFuncionario(supabase, params.id).then((dados) => {
       if (ativo) setColaborador(dados);
+    });
+    return () => {
+      ativo = false;
+    };
+  }, [params.id]);
+
+  useEffect(() => {
+    let ativo = true;
+    const supabase = createClient();
+    obterNotasFuncionarios(supabase, [params.id]).then((notas) => {
+      if (ativo) setNota(notas[params.id]);
     });
     return () => {
       ativo = false;
@@ -63,7 +77,15 @@ export default function EditarColaboradorPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={colaborador.nome} description="Edite os dados do freelancer." />
+      <PageHeader
+        title={
+          <span className="flex flex-wrap items-center gap-2">
+            {colaborador.nome}
+            <NotaMediaBadge notaMedia={nota?.notaMedia} totalAvaliacoes={nota?.totalAvaliacoes} />
+          </span>
+        }
+        description="Edite os dados do freelancer."
+      />
       <div className="mx-auto max-w-3xl">
         <ColaboradorForm
           empresaId={perfil.empresa_id ?? ""}

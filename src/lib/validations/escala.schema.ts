@@ -16,6 +16,7 @@ export type EscalaFuncaoInput = z.infer<typeof escalaFuncaoSchema>;
 
 export const convidarColaboradorSchema = z.object({
   funcionario_ids: z.array(z.string()).min(1, "Selecione ao menos um freelancer"),
+  canal: z.enum(["whatsapp", "email"], { error: "Selecione por onde enviar o convite" }),
   valor_diaria: z.string().optional().or(z.literal("")),
   observacoes: z.string().optional().or(z.literal("")),
 });

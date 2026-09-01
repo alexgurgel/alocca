@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import QRCode from "qrcode";
+import { formatDateTime } from "@/lib/format";
 
 let resend: Resend | null = null;
 
@@ -29,10 +30,7 @@ export async function enviarEmailConfirmacaoFreelancer({
   eventoDataInicio,
   qrToken,
 }: EnviarEmailConfirmacaoParams) {
-  const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(eventoDataInicio));
+  const dataFormatada = formatDateTime(eventoDataInicio);
 
   const qrCodePng = await QRCode.toBuffer(qrToken, { width: 240, margin: 1 });
 
@@ -59,6 +57,49 @@ export async function enviarEmailConfirmacaoFreelancer({
         contentId: "checkin-qr",
       },
     ],
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+interface EnviarEmailConviteParams {
+  paraEmail: string;
+  nomeFreelancer: string;
+  eventoNome: string;
+  funcaoNome: string;
+  eventoLocal: string | null;
+  eventoDataInicio: string;
+  linkConvite: string;
+}
+
+export async function enviarEmailConvite({
+  paraEmail,
+  nomeFreelancer,
+  eventoNome,
+  funcaoNome,
+  eventoLocal,
+  eventoDataInicio,
+  linkConvite,
+}: EnviarEmailConviteParams) {
+  const dataFormatada = formatDateTime(eventoDataInicio);
+
+  const { error } = await getResend().emails.send({
+    from: "Alocca <contato@alocca.app.br>",
+    to: paraEmail,
+    subject: `Convite: ${eventoNome}`,
+    html: `
+      <p>Olá, ${nomeFreelancer}!</p>
+      <p>Você foi convidado(a) para a função <strong>${funcaoNome}</strong> no evento <strong>${eventoNome}</strong>.</p>
+      <p>
+        <strong>Data:</strong> ${dataFormatada}<br />
+        ${eventoLocal ? `<strong>Local:</strong> ${eventoLocal}<br />` : ""}
+      </p>
+      <p>Confira os detalhes e responda pelo link abaixo:</p>
+      <p><a href="${linkConvite}">${linkConvite}</a></p>
+      <p>Equipe Alocca</p>
+    `,
   });
 
   if (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { CalendarDays, Download, FileSpreadsheet, FileText, Loader2, MapPin, ShieldOff, Users } from "lucide-react";
 
@@ -53,6 +53,14 @@ export default function ListaConfirmadosPublicaPage() {
 
   const [info, setInfo] = useState<ListaPublicaEventoInfo | null | undefined>(undefined);
   const [confirmados, setConfirmados] = useState<FreelancerConfirmado[]>([]);
+
+  const resumoPorFuncao = useMemo(() => {
+    const contagem = new Map<string, number>();
+    for (const c of confirmados) {
+      contagem.set(c.funcao_nome, (contagem.get(c.funcao_nome) ?? 0) + 1);
+    }
+    return Array.from(contagem.entries()).sort((a, b) => a[0].localeCompare(b[0], "pt-BR"));
+  }, [confirmados]);
 
   useEffect(() => {
     let ativo = true;
@@ -161,6 +169,22 @@ export default function ListaConfirmadosPublicaPage() {
                   </DropdownMenu>
                 ) : null}
               </div>
+
+              {confirmados.length > 0 ? (
+                <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
+                  {resumoPorFuncao.map(([funcaoNome, total]) => (
+                    <span
+                      key={funcaoNome}
+                      className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground"
+                    >
+                      {funcaoNome}: {total}
+                    </span>
+                  ))}
+                  <span className="rounded-full border border-primary bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                    Total geral: {confirmados.length}
+                  </span>
+                </div>
+              ) : null}
 
               {confirmados.length === 0 ? (
                 <EmptyState

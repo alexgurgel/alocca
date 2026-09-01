@@ -6,17 +6,26 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckinStatusButtons } from "./checkin-status-buttons";
 import { QrScannerDialog } from "./qr-scanner-dialog";
-import { useCheckin } from "@/hooks/use-checkin";
+import type { useCheckin } from "@/hooks/use-checkin";
 import { getInitials } from "@/lib/format";
 import { STATUS_CHECKIN_LABEL } from "@/types";
 
-interface CheckinListProps {
+interface CheckinListProps extends Pick<
+  ReturnType<typeof useCheckin>,
+  "checkins" | "carregando" | "marcarStatus" | "recarregar"
+> {
   eventoId: string;
   eventoDataInicio: string;
 }
 
-export function CheckinList({ eventoId, eventoDataInicio }: CheckinListProps) {
-  const { checkins, carregando, marcarStatus, recarregar } = useCheckin(eventoId);
+export function CheckinList({
+  eventoId,
+  eventoDataInicio,
+  checkins,
+  carregando,
+  marcarStatus,
+  recarregar,
+}: CheckinListProps) {
 
   const contagem = {
     presente: checkins.filter((c) => c.status === "presente").length,

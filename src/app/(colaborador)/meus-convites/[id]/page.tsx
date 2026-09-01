@@ -42,6 +42,13 @@ export default function ConviteDetailPage() {
       const supabase = createClient();
       await responderConvite(supabase, convite.id, status);
       toast.success(status === "aceito" ? "Convite aceito!" : "Convite recusado.");
+      if (status === "aceito") {
+        fetch("/api/notificar-confirmacao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conviteId: convite.id }),
+        }).catch(() => {});
+      }
       router.refresh();
       await carregar();
     } catch {

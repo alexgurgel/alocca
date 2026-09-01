@@ -15,7 +15,7 @@ import {
   enviarConvite,
   responderConvite,
 } from "@/services/convites.service";
-import type { EscalaFuncao } from "@/types";
+import type { ConviteComRelacoes, EscalaFuncao } from "@/types";
 import type { EscalaFuncaoInput, ConvidarColaboradorInput } from "@/lib/validations/escala.schema";
 import { toast } from "sonner";
 
@@ -98,22 +98,20 @@ export function useEscala(eventoId: string | undefined) {
   );
 
   const convidar = useCallback(
-    async (funcaoId: string, input: ConvidarColaboradorInput) => {
-      if (!eventoId) return;
+    async (funcaoId: string, input: ConvidarColaboradorInput): Promise<ConviteComRelacoes[]> => {
+      if (!eventoId) return [];
       const funcaoEscalada = escala.find((e) => e.funcao_id === funcaoId);
       if (funcaoEscalada) {
         const preenchidas = funcaoEscalada.convites.filter((c) => c.status === "aceito").length;
         if (preenchidas >= funcaoEscalada.vagas) {
           toast.error(`As vagas de ${funcaoEscalada.funcao.nome} já estão 100% preenchidas.`);
-          return;
+          return [];
         }
       }
       const supabase = createClient();
-      await enviarConvite(supabase, eventoId, funcaoId, input);
-      toast.success(
-        input.funcionario_ids.length > 1 ? "Convites enviados aos freelancers." : "Convite enviado ao freelancer."
-      );
+      const criados = await enviarConvite(supabase, eventoId, funcaoId, input);
       await recarregar();
+      return criados as unknown as ConviteComRelacoes[];
     },
     [eventoId, escala, recarregar]
   );

@@ -1,4 +1,5 @@
 import type {
+  AvaliacaoFreelancer,
   Database,
   PlanoAcesso,
   StatusCheckin,
@@ -17,6 +18,7 @@ export type {
   PapelUsuario,
   PlanoAcesso,
   StatusConta,
+  AvaliacaoFreelancer,
 } from "./database.types";
 
 export type Empresa = Database["public"]["Tables"]["empresas"]["Row"];
@@ -84,6 +86,18 @@ export const STATUS_CONTA_LABEL: Record<StatusConta, string> = {
   pendente: "Pendente",
   aprovado: "Aprovado",
   recusado: "Recusado",
+};
+
+export const AVALIACAO_LABEL: Record<AvaliacaoFreelancer, string> = {
+  recomendo: "Recomendo novamente",
+  ok: "Ok, cumpriu o combinado",
+  nao_recomendo: "Não recomendo",
+};
+
+export const AVALIACAO_NOTA: Record<AvaliacaoFreelancer, number> = {
+  recomendo: 10,
+  ok: 6,
+  nao_recomendo: 2,
 };
 
 // Free: eventos, freelancers, escalas, check-in, configurações e o link

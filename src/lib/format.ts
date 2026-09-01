@@ -28,22 +28,27 @@ export function formatCurrencyBRL(value: number | null | undefined) {
   }).format(value);
 }
 
+// Fixo em vez de depender do fuso do ambiente de execução: no navegador do
+// promotor isso já é America/Sao_Paulo, mas rotas de servidor (ex: envio de
+// e-mail) rodam em UTC e mostravam um horário divergente do cadastrado.
+const FUSO_HORARIO = "America/Sao_Paulo";
+
 export function formatDate(value: string | Date | null | undefined) {
   if (!value) return "—";
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(date);
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: FUSO_HORARIO }).format(date);
 }
 
 export function formatDateLong(value: string | Date | null | undefined) {
   if (!value) return "—";
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: FUSO_HORARIO }).format(date);
 }
 
 export function formatTime(value: string | Date | null | undefined) {
   if (!value) return "—";
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat("pt-BR", { timeStyle: "short" }).format(date);
+  return new Intl.DateTimeFormat("pt-BR", { timeStyle: "short", timeZone: FUSO_HORARIO }).format(date);
 }
 
 export function formatDateTime(value: string | Date | null | undefined) {
@@ -52,6 +57,7 @@ export function formatDateTime(value: string | Date | null | undefined) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
+    timeZone: FUSO_HORARIO,
   }).format(date);
 }
 

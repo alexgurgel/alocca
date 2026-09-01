@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
-import type { CheckinComRelacoes, StatusCheckin } from "@/types";
+import type { AvaliacaoFreelancer, CheckinComRelacoes, StatusCheckin } from "@/types";
 
 /**
  * Garante que exista uma linha de check-in (status "pendente") para cada
@@ -138,4 +138,70 @@ export async function atualizarStatusCheckin(
 
   if (error) throw error;
   return data;
+}
+
+export async function atualizarAvaliacaoCheckin(
+  supabase: SupabaseClient<Database>,
+  id: string,
+  avaliacao: AvaliacaoFreelancer | null
+) {
+  const { data, error } = await supabase
+    .from("checkins")
+    .update({ avaliacao })
+    .eq("id", id)
+    .select("*, funcionario:funcionarios(*)")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Aplica a mesma avaliacao a todos os checkins do evento de uma vez —
+ * "avaliar todos". O promotor pode voltar depois e ajustar so os que
+ * quiser individualmente.
+ */
+export async function avaliarTodosCheckinsDoEvento(
+  supabase: SupabaseClient<Database>,
+  eventoId: string,
+  avaliacao: AvaliacaoFreelancer
+) {
+  const { error } = await supabase
+    .from("checkins")
+    .update({ avaliacao })
+    .eq("evento_id", eventoId);
+
+  if (error) throw error;
+}
+
+export interface NotaFuncionario {
+  notaMedia: number | null;
+  totalAvaliacoes: number;
+}
+
+/**
+ * Busca a nota media (1-10) de varios freelancers de uma vez, calculada
+ * a partir de todas as avaliacoes ja registradas em qualquer evento.
+ * Quem nunca foi avaliado nao aparece no retorno (fica undefined).
+ */
+export async function obterNotasFuncionarios(
+  supabase: SupabaseClient<Database>,
+  funcionarioIds: string[]
+): Promise<Record<string, NotaFuncionario>> {
+  if (funcionarioIds.length === 0) return {};
+
+  const { data, error } = await supabase.rpc("obter_notas_funcionarios", {
+    p_funcionario_ids: funcionarioIds,
+  });
+
+  if (error) throw error;
+
+  const resultado: Record<string, NotaFuncionario> = {};
+  for (const linha of data ?? []) {
+    resultado[linha.funcionario_id] = {
+      notaMedia: linha.nota_media,
+      totalAvaliacoes: linha.total_avaliacoes,
+    };
+  }
+  return resultado;
 }

@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, Loader2, UserPlus } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Mail, MessageCircle, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ import {
 } from "@/lib/validations/escala.schema";
 import { createClient } from "@/lib/supabase/client";
 import { listFuncionariosAtivos } from "@/services/funcionarios.service";
-import { cn } from "@/lib/utils";
+import { obterNotasFuncionarios, type NotaFuncionario } from "@/services/checkins.service";
+import { NotaMediaBadge } from "@/components/shared/nota-media-badge";
 import type { Funcionario } from "@/types";
 
 interface ConvidarColaboradorDialogProps {
@@ -56,11 +58,15 @@ export function ConvidarColaboradorDialog({
   const [open, setOpen] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
   const [freelancers, setFreelancers] = useState<Funcionario[]>([]);
+  const [notas, setNotas] = useState<Record<string, NotaFuncionario>>({});
 
   useEffect(() => {
     if (!open) return;
     const supabase = createClient();
-    listFuncionariosAtivos(supabase, empresaId).then(setFreelancers);
+    listFuncionariosAtivos(supabase, empresaId).then((dados) => {
+      setFreelancers(dados);
+      obterNotasFuncionarios(supabase, dados.map((f) => f.id)).then(setNotas);
+    });
   }, [open, empresaId]);
 
   const disponiveis = useMemo(
@@ -78,12 +84,14 @@ export function ConvidarColaboradorDialog({
     resolver: zodResolver(convidarColaboradorSchema),
     defaultValues: {
       funcionario_ids: [],
+      canal: "whatsapp",
       valor_diaria: valorPadrao ? String(valorPadrao) : "",
       observacoes: "",
     },
   });
 
   const idsSelecionados = useWatch({ control, name: "funcionario_ids" }) ?? [];
+  const canalSelecionado = useWatch({ control, name: "canal" });
   const freelancersSelecionados = freelancers.filter((c) => idsSelecionados.includes(c.id));
 
   function handleAbrir() {
@@ -96,7 +104,12 @@ export function ConvidarColaboradorDialog({
 
   async function onSubmit(values: ConvidarColaboradorInput) {
     await onConvidar(values);
-    reset({ funcionario_ids: [], valor_diaria: valorPadrao ? String(valorPadrao) : "", observacoes: "" });
+    reset({
+      funcionario_ids: [],
+      canal: "whatsapp",
+      valor_diaria: valorPadrao ? String(valorPadrao) : "",
+      observacoes: "",
+    });
     setOpen(false);
   }
 
@@ -133,8 +146,13 @@ export function ConvidarColaboradorDialog({
                         <span className="text-muted-foreground">Selecione um ou mais freelancers</span>
                       ) : (
                         freelancersSelecionados.map((f) => (
-                          <Badge key={f.id} variant="secondary" className="font-normal">
+                          <Badge key={f.id} variant="secondary" className="gap-1 font-normal">
                             {f.nome}
+                            <NotaMediaBadge
+                              notaMedia={notas[f.id]?.notaMedia}
+                              totalAvaliacoes={notas[f.id]?.totalAvaliacoes}
+                              className="border-0 bg-transparent p-0"
+                            />
                           </Badge>
                         ))
                       )}
@@ -160,8 +178,14 @@ export function ConvidarColaboradorDialog({
                                   );
                                 }}
                               >
-                                <Check className={cn("size-4", marcado ? "opacity-100" : "opacity-0")} />
-                                {freelancer.nome}
+                                <Check className={cn("size-4 shrink-0", marcado ? "opacity-100" : "opacity-0")} />
+                                <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                                  <span className="truncate">{freelancer.nome}</span>
+                                  <NotaMediaBadge
+                                    notaMedia={notas[freelancer.id]?.notaMedia}
+                                    totalAvaliacoes={notas[freelancer.id]?.totalAvaliacoes}
+                                  />
+                                </span>
                               </CommandItem>
                             );
                           })}
@@ -173,6 +197,45 @@ export function ConvidarColaboradorDialog({
               )}
             />
             <FieldError errors={[errors.funcionario_ids]} />
+          </Field>
+
+          <Field data-invalid={!!errors.canal}>
+            <FieldLabel>Enviar convite por</FieldLabel>
+            <Controller
+              control={control}
+              name="canal"
+              render={({ field }) => (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => field.onChange("whatsapp")}
+                    className={cn(
+                      "inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                      field.value === "whatsapp"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <MessageCircle className="size-4" />
+                    WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => field.onChange("email")}
+                    className={cn(
+                      "inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                      field.value === "email"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Mail className="size-4" />
+                    E-mail
+                  </button>
+                </div>
+              )}
+            />
+            <FieldError errors={[errors.canal]} />
           </Field>
 
           <Field data-invalid={!!errors.valor_diaria}>
@@ -189,7 +252,7 @@ export function ConvidarColaboradorDialog({
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-              Enviar convite
+              {canalSelecionado === "email" ? "Enviar convite por e-mail" : "Enviar convite por WhatsApp"}
             </Button>
           </DialogFooter>
         </form>
