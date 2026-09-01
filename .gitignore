@@ -42,3 +42,6 @@ next-env.d.ts
 
 # materiais de submissao da Play Store (icones, screenshots) - so local
 playstore-assets/
+
+# materiais de marketing (redes sociais, fundos de reuniao) - so local
+marketing-assets/
