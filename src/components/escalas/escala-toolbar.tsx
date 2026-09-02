@@ -9,20 +9,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { StatusConvite } from "@/types";
 
-export type EscalaFiltroStatus = "todas" | "abertas" | "completas" | "pendentes";
-export type EscalaOrdenacao = "nome" | "vagas_preenchidas" | "valor_diaria";
+export type EscalaFiltroStatus = StatusConvite | "todos";
+export type EscalaOrdenacao = "nome" | "status" | "valor_diaria";
 
 const STATUS_LABEL: Record<EscalaFiltroStatus, string> = {
-  todas: "Todas as funções",
-  abertas: "Com vagas em aberto",
-  completas: "Vagas completas",
-  pendentes: "Com candidaturas pendentes",
+  todos: "Todos os status",
+  pendente: "Pendente",
+  aceito: "Aceito",
+  recusado: "Recusado",
 };
 
 const ORDENACAO_LABEL: Record<EscalaOrdenacao, string> = {
   nome: "Nome (A-Z)",
-  vagas_preenchidas: "Vagas preenchidas",
+  status: "Status",
   valor_diaria: "Valor da diária",
 };
 
@@ -50,7 +51,7 @@ export function EscalaToolbar({
         <Input
           value={busca}
           onChange={(e) => onBuscaChange(e.target.value)}
-          placeholder="Buscar função..."
+          placeholder="Buscar freelancer..."
           className="pl-8"
         />
       </div>
@@ -60,7 +61,7 @@ export function EscalaToolbar({
         value={status}
         onValueChange={(value) => onStatusChange(value as EscalaFiltroStatus)}
       >
-        <SelectTrigger className="w-full sm:w-52">
+        <SelectTrigger className="w-full sm:w-44">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>

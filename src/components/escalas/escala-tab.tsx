@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdicionarFuncaoDialog } from "./adicionar-funcao-dialog";
 import { EscalaFuncaoCard } from "./escala-funcao-card";
 import { EscalaToolbar, type EscalaFiltroStatus, type EscalaOrdenacao } from "./escala-toolbar";
-import type { Evento } from "@/types";
+import type { ConviteComRelacoes, Evento } from "@/types";
 
 export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Evento }) {
   const {
@@ -26,44 +26,43 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
   const { funcoes } = useFuncoes(empresaId);
 
   const [busca, setBusca] = useState("");
-  const [status, setStatus] = useState<EscalaFiltroStatus>("todas");
+  const [status, setStatus] = useState<EscalaFiltroStatus>("todos");
   const [ordenarPor, setOrdenarPor] = useState<EscalaOrdenacao>("nome");
 
-  const escalaFiltrada = useMemo(() => {
+  const filtroAtivo = busca.trim().length > 0 || status !== "todos";
+
+  const escalaComConvitesFiltrados = useMemo(() => {
     const buscaNormalizada = busca.trim().toLowerCase();
 
-    const filtrada = escala.filter((item) => {
-      if (buscaNormalizada && !item.funcao.nome.toLowerCase().includes(buscaNormalizada)) {
-        return false;
+    function ordenarConvites(convites: ConviteComRelacoes[]) {
+      return [...convites].sort((a, b) => {
+        if (ordenarPor === "status") {
+          return a.status.localeCompare(b.status);
+        }
+        if (ordenarPor === "valor_diaria") {
+          return (b.valor_diaria ?? 0) - (a.valor_diaria ?? 0);
+        }
+        return a.funcionario.nome.localeCompare(b.funcionario.nome, "pt-BR");
+      });
+    }
+
+    return escala.map((item) => {
+      let convites = item.convites;
+
+      if (buscaNormalizada) {
+        convites = convites.filter((c) => c.funcionario.nome.toLowerCase().includes(buscaNormalizada));
+      }
+      if (status !== "todos") {
+        convites = convites.filter((c) => c.status === status);
       }
 
-      const preenchidas = item.convites.filter((c) => c.status === "aceito").length;
-      if (status === "abertas" && preenchidas >= item.vagas) return false;
-      if (status === "completas" && preenchidas < item.vagas) return false;
-      if (
-        status === "pendentes" &&
-        !item.convites.some((c) => c.origem === "candidatura" && c.status === "pendente")
-      ) {
-        return false;
-      }
-
-      return true;
+      return { item, convitesExibidos: ordenarConvites(convites) };
     });
-
-    const ordenada = [...filtrada].sort((a, b) => {
-      if (ordenarPor === "vagas_preenchidas") {
-        const preenchidasA = a.convites.filter((c) => c.status === "aceito").length;
-        const preenchidasB = b.convites.filter((c) => c.status === "aceito").length;
-        return preenchidasB - preenchidasA;
-      }
-      if (ordenarPor === "valor_diaria") {
-        return (b.valor_diaria ?? 0) - (a.valor_diaria ?? 0);
-      }
-      return a.funcao.nome.localeCompare(b.funcao.nome, "pt-BR");
-    });
-
-    return ordenada;
   }, [escala, busca, status, ordenarPor]);
+
+  const funcoesVisiveis = filtroAtivo
+    ? escalaComConvitesFiltrados.filter(({ convitesExibidos }) => convitesExibidos.length > 0)
+    : escalaComConvitesFiltrados;
 
   return (
     <div className="space-y-4">
@@ -103,20 +102,21 @@ export function EscalaTab({ empresaId, evento }: { empresaId: string; evento: Ev
             onOrdenarPorChange={setOrdenarPor}
           />
 
-          {escalaFiltrada.length === 0 ? (
+          {funcoesVisiveis.length === 0 ? (
             <EmptyState
               icon={ClipboardList}
-              title="Nenhuma função encontrada"
-              description="Ajuste a busca ou o filtro para ver outras funções da escala."
+              title="Nenhum freelancer encontrado"
+              description="Ajuste a busca ou o filtro para ver outros freelancers da escala."
             />
           ) : (
             <div className="space-y-3">
-              {escalaFiltrada.map((item) => (
+              {funcoesVisiveis.map(({ item, convitesExibidos }) => (
                 <EscalaFuncaoCard
                   key={item.id}
                   empresaId={empresaId}
                   eventoNome={evento.nome}
                   escala={item}
+                  convitesExibidos={convitesExibidos}
                   onAtualizarVagas={atualizarVagas}
                   onAtualizarValorDiaria={atualizarValorDiaria}
                   onRemoverFuncao={removerFuncao}
