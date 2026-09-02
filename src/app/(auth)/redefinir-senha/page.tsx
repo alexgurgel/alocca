@@ -34,21 +34,32 @@ function RedefinirSenhaForm() {
   useEffect(() => {
     async function prepararSessaoDeRecuperacao() {
       const supabase = createClient();
+      const tokenHash = searchParams.get("token_hash");
       const code = searchParams.get("code");
 
-      // O link do e-mail chega com ?code=... (fluxo PKCE, igual a confirmacao
-      // de cadastro) — sem trocar esse codigo por uma sessao, updateUser()
-      // falha porque nao ha ninguem "logado" pra ter a senha trocada. Essa
-      // troca nunca estava acontecendo aqui, por isso a pagina sempre dava erro.
+      // Link novo (token_hash): verificado direto no servidor da Supabase,
+      // funciona em qualquer navegador/aparelho — ao contrario do fluxo por
+      // ?code=, nao depende de um "code_verifier" salvo no navegador que
+      // pediu a redefinicao. Precisa do template de e-mail "Reset Password"
+      // configurado no painel da Supabase para usar {{ .TokenHash }} em vez
+      // de {{ .ConfirmationURL }}.
+      if (tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+        setEstadoSessao(error ? "invalida" : "pronta");
+        return;
+      }
+
+      // Link antigo com ?code=... (fluxo PKCE) — so funciona no mesmo
+      // navegador/aparelho que solicitou a redefinicao.
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         setEstadoSessao(error ? "invalida" : "pronta");
         return;
       }
 
-      // Sem "code" na URL: pode ser o fluxo antigo por hash (#access_token=...),
-      // que o supabase-js ja processa sozinho ao carregar a pagina. So
-      // confirma se, de fato, existe uma sessao ativa.
+      // Sem token_hash nem code na URL: pode ser o fluxo antigo por hash
+      // (#access_token=...), que o supabase-js ja processa sozinho ao
+      // carregar a pagina. So confirma se, de fato, existe uma sessao ativa.
       const {
         data: { user },
       } = await supabase.auth.getUser();
