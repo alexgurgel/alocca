@@ -21,6 +21,12 @@ interface EscalaFuncaoCardProps {
   empresaId: string;
   eventoNome: string;
   escala: EscalaFuncao;
+  /**
+   * Convites a exibir na lista (ja filtrados/ordenados pela busca da aba).
+   * As contagens de vagas continuam usando escala.convites (lista completa),
+   * senao "preenchidas" ficaria errada ao filtrar por nome/status.
+   */
+  convitesExibidos?: ConviteComRelacoes[];
   onAtualizarVagas: (id: string, vagas: number) => Promise<void>;
   onAtualizarValorDiaria: (id: string, valorDiaria: number) => Promise<void>;
   onRemoverFuncao: (id: string) => Promise<void>;
@@ -37,6 +43,7 @@ export function EscalaFuncaoCard({
   empresaId,
   eventoNome,
   escala,
+  convitesExibidos,
   onAtualizarVagas,
   onAtualizarValorDiaria,
   onRemoverFuncao,
@@ -49,10 +56,11 @@ export function EscalaFuncaoCard({
   const [valorDiariaInput, setValorDiariaInput] = useState(
     escala.valor_diaria != null ? String(escala.valor_diaria) : ""
   );
+  const convitesParaExibir = convitesExibidos ?? escala.convites;
   const preenchidas = escala.convites.filter((c) => c.status === "aceito").length;
-  const temMaisQueLimite = escala.convites.length > LIMITE_VISIVEIS;
+  const temMaisQueLimite = convitesParaExibir.length > LIMITE_VISIVEIS;
   const convitesVisiveis =
-    mostrarTodos || !temMaisQueLimite ? escala.convites : escala.convites.slice(0, LIMITE_VISIVEIS);
+    mostrarTodos || !temMaisQueLimite ? convitesParaExibir : convitesParaExibir.slice(0, LIMITE_VISIVEIS);
 
   async function copiarLink(conviteId: string) {
     const link = getLinkConvite(conviteId);
@@ -196,7 +204,7 @@ export function EscalaFuncaoCard({
         </div>
       </div>
 
-      {escala.convites.length > 0 ? (
+      {convitesParaExibir.length > 0 ? (
         <ul className="mt-4 divide-y divide-border border-t border-border">
           {convitesVisiveis.map((convite) => (
             <li key={convite.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
@@ -341,7 +349,7 @@ export function EscalaFuncaoCard({
           ) : (
             <>
               <ChevronDown className="size-3.5" />
-              Ver mais ({escala.convites.length - LIMITE_VISIVEIS})
+              Ver mais ({convitesParaExibir.length - LIMITE_VISIVEIS})
             </>
           )}
         </button>
@@ -350,6 +358,10 @@ export function EscalaFuncaoCard({
       {escala.convites.length === 0 ? (
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
           Nenhum freelancer convidado para esta função ainda.
+        </p>
+      ) : convitesParaExibir.length === 0 ? (
+        <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
+          Nenhum freelancer encontrado com esse filtro nesta função.
         </p>
       ) : null}
 
