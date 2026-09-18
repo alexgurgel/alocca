@@ -28,6 +28,7 @@ export default function PainelPage() {
           icon={CalendarDays}
           tone="blue"
           loading={carregando}
+          href="/eventos"
         />
         <StatCard
           label="Eventos hoje"
@@ -35,6 +36,7 @@ export default function PainelPage() {
           icon={CalendarClock}
           tone="purple"
           loading={carregando}
+          href="/eventos"
         />
         <StatCard
           label="Freelancers ativos"
@@ -42,6 +44,7 @@ export default function PainelPage() {
           icon={Users}
           tone="blue"
           loading={carregando}
+          href="/colaboradores"
         />
         <StatCard
           label="Freelancers convocados"
@@ -49,6 +52,7 @@ export default function PainelPage() {
           icon={UsersRound}
           tone="cyan"
           loading={carregando}
+          href="/colaboradores"
         />
         <StatCard
           label="Trabalhando hoje"
@@ -56,6 +60,7 @@ export default function PainelPage() {
           icon={UserCheck}
           tone="purple"
           loading={carregando}
+          href="/checkin"
         />
       </div>
 
